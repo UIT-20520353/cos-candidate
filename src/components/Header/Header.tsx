@@ -10,8 +10,8 @@ function Header() {
       <div className={"flex flex-row items-center gap-x-10"}>
         <NavLink
           className={({ isActive }) =>
-            `border-b-[3px] border-transparent font-sans text-lg font-medium duration-300 ease-linear hover:border-black ${
-              isActive ? "border-black" : ""
+            `border-b-[3px] font-sans text-lg font-medium duration-300 ease-linear hover:border-black ${
+              isActive ? "border-black" : "border-transparent"
             }`
           }
           to={"/contests"}
@@ -20,8 +20,8 @@ function Header() {
         </NavLink>
         <NavLink
           className={({ isActive }) =>
-            `border-b-[3px] border-transparent font-sans text-lg font-medium duration-300 ease-linear hover:border-black ${
-              isActive ? "border-black" : ""
+            `border-b-[3px] font-sans text-lg font-medium duration-300 ease-linear hover:border-black ${
+              isActive ? "border-black" : "border-transparent"
             }`
           }
           to={"/teams"}
@@ -30,8 +30,8 @@ function Header() {
         </NavLink>
         <NavLink
           className={({ isActive }) =>
-            `border-b-[3px] border-transparent font-sans text-lg font-medium duration-300 ease-linear hover:border-black ${
-              isActive ? "border-black" : ""
+            `border-b-[3px] font-sans text-lg font-medium duration-300 ease-linear hover:border-black ${
+              isActive ? "border-black" : "border-transparent"
             }`
           }
           to={"/ranking"}
