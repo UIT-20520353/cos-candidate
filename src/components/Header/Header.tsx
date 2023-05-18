@@ -4,27 +4,35 @@ import { NavLink } from "react-router-dom";
 function Header() {
   return (
     <div className={"sticky top-0 flex h-20 w-full items-center justify-between bg-gray-50 px-12 shadow-md"}>
-      <img src={logo} className={"ml-16 h-10"} alt={""} />
+      <NavLink to={"/"}>
+        <img src={logo} className={"ml-16 h-10 cursor-pointer"} alt={""} />
+      </NavLink>
       <div className={"flex flex-row items-center gap-x-10"}>
         <NavLink
-          className={
-            "border-b-[3px] border-transparent font-sans text-lg font-medium duration-300 ease-linear hover:border-black"
+          className={({ isActive }) =>
+            `border-b-[3px] border-transparent font-sans text-lg font-medium duration-300 ease-linear hover:border-black ${
+              isActive ? "border-black" : ""
+            }`
           }
           to={"/contests"}
         >
           Danh sách cuộc thi
         </NavLink>
         <NavLink
-          className={
-            "border-b-[3px] border-transparent font-sans text-lg font-medium duration-300 ease-linear hover:border-black"
+          className={({ isActive }) =>
+            `border-b-[3px] border-transparent font-sans text-lg font-medium duration-300 ease-linear hover:border-black ${
+              isActive ? "border-black" : ""
+            }`
           }
           to={"/teams"}
         >
           Danh sách đội
         </NavLink>
         <NavLink
-          className={
-            "border-b-[3px] border-transparent font-sans text-lg font-medium duration-300 ease-linear hover:border-black"
+          className={({ isActive }) =>
+            `border-b-[3px] border-transparent font-sans text-lg font-medium duration-300 ease-linear hover:border-black ${
+              isActive ? "border-black" : ""
+            }`
           }
           to={"/ranking"}
         >

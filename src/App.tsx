@@ -5,7 +5,7 @@ function App() {
   return (
     <div>
       <AppRouter />
-      <ToastContainer/>
+      <ToastContainer />
     </div>
   );
 }
