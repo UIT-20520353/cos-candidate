@@ -1,18 +1,7 @@
 import Header from "../../components/Header";
-import { useDispatch, useSelector } from "react-redux";
-import { userLogin } from "../login/user.reducer";
-import { RootState } from "../../store";
 import "react-toastify/dist/ReactToastify.css";
-import { toast } from "react-toastify";
 
 function Dashboard() {
-  const user = useSelector((state: RootState) => state.user);
-  const dispatch = useDispatch();
-  const handleClick = () => {
-    dispatch(userLogin({ id: "user-1-1", name: "Xuân Vương" }));
-    toast("Đăng nhập thành công", { position: toast.POSITION.TOP_RIGHT });
-  };
-
   return (
     <div className={"flex w-full flex-col items-center"}>
       <Header />
