@@ -1,9 +1,46 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { FormEvent, useState } from "react";
+import Swal from "sweetalert2";
+import { useDispatch } from "react-redux";
+import { userLogin } from "./user.reducer";
 
 function Login() {
+  const [userName, setUserName] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (userName === "thisinh" && password === "123") {
+      dispatch(userLogin({ id: "user-1-1", name: "Xuân Vương" }));
+      navigate("/", { replace: true });
+      Swal.fire({
+        position: "bottom-end",
+        icon: "success",
+        title: "Đăng nhập thành công",
+        showConfirmButton: false,
+        timer: 2000,
+        toast: true
+      });
+    } else {
+      Swal.fire({
+        position: "bottom-end",
+        icon: "error",
+        title: "Đăng nhập không thành công",
+        showConfirmButton: false,
+        timer: 2000,
+        toast: true
+      });
+    }
+  };
+
   return (
     <div className={"flex h-screen items-center justify-center"}>
-      <form className={"flex w-1/2 flex-col items-center gap-y-5 rounded-md bg-gray-200 p-3 shadow-md"}>
+      <form
+        onSubmit={handleFormSubmit}
+        className={"flex w-1/2 flex-col items-center gap-y-5 rounded-md bg-gray-200 p-3 shadow-md"}
+      >
         <p className={"font-serif text-3xl font-semibold tracking-wider"}>Đăng nhập</p>
         <div className={"w-full"}>
           <label htmlFor="user-name" className={"mb-2 block text-base font-medium font-medium text-gray-900"}>
@@ -15,6 +52,8 @@ function Login() {
             className={
               "block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
             }
+            value={userName}
+            onChange={(event) => setUserName(event.target.value)}
           />
         </div>
         <div className={"w-full"}>
@@ -27,6 +66,8 @@ function Login() {
             className={
               "block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
             }
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
           />
         </div>
         <div className={"mt-4 flex w-full flex-col items-start gap-y-3"}>

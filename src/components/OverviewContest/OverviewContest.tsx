@@ -1,4 +1,4 @@
-import { BiTimeFive, MdDateRange, RiTeamFill } from "react-icons/all";
+import { BiTimeFive, GiDuration, MdDateRange, RiTeamFill } from "react-icons/all";
 // import { NavLink } from "react-router-dom";
 import { IOverviewContest } from "../../types/contest.type";
 import { useEffect, useState } from "react";
@@ -39,15 +39,21 @@ function OverviewContest(props: IOverviewContest) {
         <BiTimeFive className={"inline-block h-5 w-5 opacity-50"} />
         <span className={"text-sm text-gray-500"}>{props.time}</span>
       </div>
+      <div className={"mt-4 flex flex-row items-center gap-x-2"}>
+        <GiDuration className={"inline-block h-5 w-5 opacity-50"} />
+        <span className={"text-sm text-gray-500"}>{props.duration}</span>
+      </div>
       <div className={"mt-4 flex flex-row items-center gap-x-3"}>
         <button
           className={`rounded-lg ${
             status === "Đã kết thúc" ? "bg-transparent" : "bg-gray-300 hover:bg-gray-400"
-          } px-4 py-2 text-sm font-semibold text-black duration-300`}
+          } px-4 py-2 text-sm font-semibold text-black duration-300 ${
+            props.registered && status !== "Đã kết thúc" ? "bg-red-200 text-red-900 hover:bg-red-300" : ""
+          }`}
           onClick={handleClick}
           disabled={status === "Đã kết thúc"}
         >
-          Đăng ký tham gia
+          {props.registered ? "Hủy đăng ký" : "Đăng ký tham gia"}
         </button>
       </div>
     </li>
