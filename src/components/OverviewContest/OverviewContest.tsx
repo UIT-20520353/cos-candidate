@@ -1,9 +1,20 @@
 import { BiTimeFive, GiDuration, MdDateRange, RiTeamFill } from "react-icons/all";
-// import { NavLink } from "react-router-dom";
 import { IOverviewContest } from "../../types/contest.type";
-import { useEffect, useState } from "react";
+import { useEffect, useState, MouseEvent } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 
-function OverviewContest(props: IOverviewContest) {
+type IPlusProps = {
+  handleCancelRegistration: (id: string) => void;
+};
+
+type IProps = IPlusProps & IOverviewContest;
+
+function OverviewContest(props: IProps) {
+  const user = useSelector((state: RootState) => state.user);
+  const navigate = useNavigate();
+
   const [status, setStatus] = useState<string>("");
   useEffect(() => {
     const dateBegin = new Date(`${props.date}T${props.time}`);
@@ -17,6 +28,13 @@ function OverviewContest(props: IOverviewContest) {
     const dateBegin = new Date(`${props.date}T${props.time}`);
     console.log(dateBegin);
   };
+  const handleNavlinkClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!user.id) {
+      event.preventDefault();
+      navigate("/login", { replace: true });
+    }
+  };
+
   return (
     <li id={props.id} className={"rounded-md border border-gray-200 bg-gray-100 p-3 shadow-md"}>
       <p className={"mb-3 truncate text-lg font-medium"}>{props.name}</p>
@@ -43,19 +61,41 @@ function OverviewContest(props: IOverviewContest) {
         <GiDuration className={"inline-block h-5 w-5 opacity-50"} />
         <span className={"text-sm text-gray-500"}>{props.duration}</span>
       </div>
-      <div className={"mt-4 flex flex-row items-center gap-x-3"}>
-        <button
-          className={`rounded-lg ${
-            status === "Đã kết thúc" ? "bg-transparent" : "bg-gray-300 hover:bg-gray-400"
-          } px-4 py-2 text-sm font-semibold text-black duration-300 ${
-            props.registered && status !== "Đã kết thúc" ? "bg-red-200 text-red-900 hover:bg-red-300" : ""
-          }`}
-          onClick={handleClick}
-          disabled={status === "Đã kết thúc"}
-        >
-          {props.registered ? "Hủy đăng ký" : "Đăng ký tham gia"}
-        </button>
-      </div>
+
+      {status !== "Đã kết thúc" && (
+        <div className={"mt-4"}>
+          {!props.registered ? (
+            <NavLink
+              className={`rounded-lg px-4 py-2 text-sm font-semibold text-black duration-300 ${
+                props.registered ? "bg-red-200 text-red-900 hover:bg-red-300" : "bg-gray-300 hover:bg-gray-400"
+              }`}
+              disabled={status === "Đã kết thúc"}
+              to={`/contest/list/register/${props.id}`}
+              onClick={handleNavlinkClick}
+            >
+              Đăng ký tham gia
+            </NavLink>
+          ) : (
+            <div className={"flex flex-row items-center gap-x-3"}>
+              <button
+                className={`rounded-lg bg-gray-300 px-4 py-2 text-sm font-semibold text-black duration-300 hover:bg-gray-400
+                `}
+                onClick={handleClick}
+              >
+                Cập nhật thông tin
+              </button>
+              <button
+                className={
+                  "rounded-lg bg-red-300 px-4 py-2 text-sm font-semibold text-red-900 duration-300 hover:bg-red-400"
+                }
+                onClick={() => props.handleCancelRegistration(props.id)}
+              >
+                Hủy đăng ký
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </li>
   );
 }

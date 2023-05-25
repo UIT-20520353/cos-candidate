@@ -7,13 +7,19 @@ const initialState: IUser = {
 };
 
 export const userLogin = createAction<IUser>("user/login");
+export const userLogout = createAction("user/logout");
 
 const userReducer = createReducer(initialState, (builder) => {
-  builder.addCase(userLogin, (state, action) => {
-    const user = action.payload;
-    state.id = user.id;
-    state.name = user.name;
-  });
+  builder
+    .addCase(userLogin, (state, action) => {
+      const user = action.payload;
+      state.id = user.id;
+      state.name = user.name;
+    })
+    .addCase(userLogout, (state) => {
+      state.id = "";
+      state.name = "";
+    });
 });
 
 export default userReducer;

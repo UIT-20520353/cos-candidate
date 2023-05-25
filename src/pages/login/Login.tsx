@@ -14,6 +14,10 @@ function Login() {
     event.preventDefault();
     if (userName === "thisinh" && password === "123") {
       dispatch(userLogin({ id: "user-1-1", name: "Xuân Vương" }));
+
+      localStorage.setItem("id", "user-1-1");
+      localStorage.setItem("name", "Xuân Vương");
+
       navigate("/", { replace: true });
       Swal.fire({
         position: "bottom-end",
