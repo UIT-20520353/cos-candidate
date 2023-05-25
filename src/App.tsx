@@ -8,7 +8,7 @@ function App() {
 
   useEffect(() => {
     if (localStorage.getItem("id")) {
-      dispatch(userLogin({ id: localStorage.getItem("id"), name: localStorage.getItem("name") }));
+      dispatch(userLogin({ id: localStorage.getItem("id") ?? "", name: localStorage.getItem("name") ?? "" }));
     }
   }, []);
 

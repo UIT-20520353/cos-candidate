@@ -20,18 +20,6 @@ function Contests() {
 
   const playedClick = () => {
     setFilter((prevState) => ({ ...prevState, played: !prevState.played }));
-    // if (!filter.played) {
-    //   const temp = initialContests.filter((contest) => {
-    //     const dateBegin = new Date(`${contest.date}T${contest.time}`);
-    //     const current = new Date();
-    //
-    //     if (current > dateBegin) return contest;
-    //   });
-    //   setContests(temp);
-    // } else {
-    //   const temp = [...initialContests];
-    //   setContests(temp);
-    // }
   };
   const playingClick = () => {
     setFilter((prevState) => ({ ...prevState, playing: !prevState.playing }));
@@ -70,6 +58,7 @@ function Contests() {
               duration={contest.duration}
               registered={contest.registered}
               handleCancelRegistration={handleCancelRegistration}
+              isBeginContest={false}
             />
           ))}
         </ul>

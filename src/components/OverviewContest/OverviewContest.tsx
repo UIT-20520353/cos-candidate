@@ -7,6 +7,7 @@ import { RootState } from "../../store";
 
 type IPlusProps = {
   handleCancelRegistration: (id: string) => void;
+  isBeginContest: boolean;
 };
 
 type IProps = IPlusProps & IOverviewContest;
@@ -28,14 +29,8 @@ function OverviewContest(props: IProps) {
     const dateBegin = new Date(`${props.date}T${props.time}`);
     console.log(dateBegin);
   };
-  const handleNavlinkClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    if (!user.id) {
-      event.preventDefault();
-      navigate("/login", { replace: true });
-    }
-  };
 
-  return (
+  return !props.isBeginContest ? (
     <li id={props.id} className={"rounded-md border border-gray-200 bg-gray-100 p-3 shadow-md"}>
       <p className={"mb-3 truncate text-lg font-medium"}>{props.name}</p>
       <span
@@ -71,7 +66,12 @@ function OverviewContest(props: IProps) {
               }`}
               disabled={status === "Đã kết thúc"}
               to={`/contest/list/register/${props.id}`}
-              onClick={handleNavlinkClick}
+              onClick={(event) => {
+                if (!user.id) {
+                  event.preventDefault();
+                  navigate("/login", { replace: true });
+                }
+              }}
             >
               Đăng ký tham gia
             </NavLink>
@@ -96,6 +96,27 @@ function OverviewContest(props: IProps) {
           )}
         </div>
       )}
+    </li>
+  ) : (
+    <li id={props.id} className={"rounded-md border border-gray-200 bg-gray-100 p-3 shadow-md"}>
+      <p className={"mb-3 truncate text-lg font-medium"}>{props.name}</p>
+      <div className={"mt-4 flex flex-row items-center gap-x-2"}>
+        <RiTeamFill className={"inline-block h-5 w-5 opacity-50"} />
+        <span className={"text-sm text-gray-500"}>{props.amount} đội tham gia</span>
+      </div>
+      <div className={"mt-4 flex flex-row items-center gap-x-2"}>
+        <MdDateRange className={"inline-block h-5 w-5 opacity-50"} />
+        <span className={"text-sm text-gray-500"}>{props.date}</span>
+      </div>
+      <div className={"mt-4 flex flex-row items-center gap-x-2"}>
+        <BiTimeFive className={"inline-block h-5 w-5 opacity-50"} />
+        <span className={"text-sm text-gray-500"}>{props.time}</span>
+      </div>
+      <div className={"mt-4 flex flex-row items-center gap-x-2"}>
+        <GiDuration className={"inline-block h-5 w-5 opacity-50"} />
+        <span className={"text-sm text-gray-500"}>{props.duration}</span>
+      </div>
+      <div className={"mt-4"}></div>
     </li>
   );
 }
