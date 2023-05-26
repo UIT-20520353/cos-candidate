@@ -21,7 +21,7 @@ function RegisterContest() {
         <div className={"flex w-full flex-row items-center justify-between"}>
           <p className={"text-2xl font-medium text-[#10002b]"}>Đăng ký tham gia cuộc thi</p>
           <NavLink
-            className={"rounded-md bg-gray-200 px-5 py-2 font-medium shadow-md hover:bg-gray-300"}
+            className={"rounded-md bg-gray-200 px-5 py-2 font-medium shadow-md duration-300 hover:bg-gray-300"}
             to={"/contest/list"}
           >
             Quay lại

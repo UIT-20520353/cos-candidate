@@ -108,7 +108,14 @@ function OverviewContest(props: IProps) {
         <GiDuration className={"inline-block h-5 w-5 opacity-50"} />
         <span className={"text-sm text-gray-500"}>{props.duration}</span>
       </div>
-      <div className={"mt-4"}></div>
+      <div className={"mt-4"}>
+        <NavLink
+          to={`/contest/enter/${props.id}`}
+          className={"rounded-lg bg-gray-300 px-4 py-2 text-sm font-semibold text-black duration-300 hover:bg-gray-400"}
+        >
+          Bắt đầu thi
+        </NavLink>
+      </div>
     </li>
   );
 }

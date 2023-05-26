@@ -8,15 +8,17 @@ import CreateTeam from "../pages/CreateTeam";
 import RegisterContest from "../pages/RegisterContest";
 import Ranking from "../pages/Ranking";
 import Exercises from "../pages/exercises";
+import ProblemsOfContest from "../pages/ProblemsOfContest";
 
 function AppRouter() {
   return (
     <Routes>
       <Route path={"/"} element={<Dashboard />} />
       <Route path={"/login"} element={<Login />} />
-      <Route path={"/contest/list"}>
-        <Route index={true} element={<Contests />} />
-        <Route path={"register/:id"} element={<RegisterContest />} />
+      <Route path={"/contest"}>
+        <Route index={true} path={"list"} element={<Contests />} />
+        <Route path={"list/register/:id"} element={<RegisterContest />} />
+        <Route path={"enter/:id"} element={<ProblemsOfContest />} />
       </Route>
       <Route path={"/reset-password"} element={<ResetPassword />} />
       <Route path={"/contest/list/registered"}>
@@ -24,7 +26,10 @@ function AppRouter() {
         <Route path={"create"} element={<CreateTeam />}></Route>
       </Route>
       <Route path={"/ranking"} element={<Ranking />} />
-      <Route path={"/problem/list"} element={<Exercises />} />
+      <Route path={"/problem"}>
+        <Route path={"list"} element={<Exercises />} index={true} />
+        {/*<Route path={"detail/:idProblem"}/>*/}
+      </Route>
     </Routes>
   );
 }
