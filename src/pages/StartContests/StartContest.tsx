@@ -1,7 +1,7 @@
 import Header from "../../components/Header";
 import OverviewContest from "../../components/OverviewContest";
 import { IOverviewContest } from "../../types/contest.type";
-import { useState } from "react";
+// import { useState } from "react";
 
 const initialContest: IOverviewContest[] = [
   {
@@ -16,15 +16,15 @@ const initialContest: IOverviewContest[] = [
 ];
 
 function StartContest() {
-  const [registeredContests, setRegisteredContests] = useState<IOverviewContest[]>(initialContest);
+  // const [registeredContests, setRegisteredContests] = useState<IOverviewContest[]>(initialContest);
 
   return (
     <div className={"flex w-full flex-col items-center"}>
       <Header />
       <div className={"mt-8 w-4/5"}>
-        <p className={"text-2xl font-medium text-[#10002b]"}>Các cuộc thi đã đăng ký</p>
+        <p className={"text-2xl font-medium text-[#10002b]"}>Bắt đầu cuộc thi</p>
         <ul className={"mt-5 grid grid-cols-3 gap-4"}>
-          {registeredContests.map((contest) => (
+          {initialContest.map((contest) => (
             <OverviewContest
               key={contest.id}
               id={contest.id}

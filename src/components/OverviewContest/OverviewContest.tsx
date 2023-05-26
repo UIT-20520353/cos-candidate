@@ -1,7 +1,7 @@
 import { BiTimeFive, GiDuration, MdDateRange, RiTeamFill } from "react-icons/all";
 import { IOverviewContest } from "../../types/contest.type";
-import { useEffect, useState, MouseEvent } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 
@@ -14,7 +14,6 @@ type IProps = IPlusProps & IOverviewContest;
 
 function OverviewContest(props: IProps) {
   const user = useSelector((state: RootState) => state.user);
-  const navigate = useNavigate();
 
   const [status, setStatus] = useState<string>("");
   useEffect(() => {
@@ -64,14 +63,7 @@ function OverviewContest(props: IProps) {
               className={`rounded-lg px-4 py-2 text-sm font-semibold text-black duration-300 ${
                 props.registered ? "bg-red-200 text-red-900 hover:bg-red-300" : "bg-gray-300 hover:bg-gray-400"
               }`}
-              disabled={status === "Đã kết thúc"}
-              to={`/contest/list/register/${props.id}`}
-              onClick={(event) => {
-                if (!user.id) {
-                  event.preventDefault();
-                  navigate("/login", { replace: true });
-                }
-              }}
+              to={`${user.id ? "/contest/list/register/" + props.id : "/login"}`}
             >
               Đăng ký tham gia
             </NavLink>
