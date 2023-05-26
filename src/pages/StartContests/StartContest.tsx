@@ -18,6 +18,10 @@ const initialContest: IOverviewContest[] = [
 function StartContest() {
   // const [registeredContests, setRegisteredContests] = useState<IOverviewContest[]>(initialContest);
 
+  const handleCancelRegistration = (id: string) => {
+    return;
+  };
+
   return (
     <div className={"flex w-full flex-col items-center"}>
       <Header />
@@ -35,6 +39,7 @@ function StartContest() {
               duration={contest.duration}
               registered={contest.registered}
               isBeginContest={true}
+              handleCancelRegistration={handleCancelRegistration}
             />
           ))}
         </ul>

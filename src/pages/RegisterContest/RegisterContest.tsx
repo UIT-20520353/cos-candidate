@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import OverviewTeam from "../../components/OverviewTeam";
 import { AiFillPlusCircle } from "react-icons/all";
+
 function RegisterContest() {
   const { id } = useParams();
   const contests = useSelector((state: RootState) => state.contests);
@@ -13,7 +14,7 @@ function RegisterContest() {
     return;
   };
 
-  return (
+  return currentContest ? (
     <div className={"flex w-full flex-col items-center"}>
       <Header />
       <div className={"my-8 flex w-4/5 flex-col items-start"}>
@@ -62,6 +63,10 @@ function RegisterContest() {
           </ul>
         </div>
       </div>
+    </div>
+  ) : (
+    <div>
+      <p>không lấy được id</p>
     </div>
   );
 }
