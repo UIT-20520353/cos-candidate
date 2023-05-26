@@ -19,6 +19,7 @@ function StartContest() {
   // const [registeredContests, setRegisteredContests] = useState<IOverviewContest[]>(initialContest);
 
   const handleCancelRegistration = (id: string) => {
+    console.log(id);
     return;
   };
 
