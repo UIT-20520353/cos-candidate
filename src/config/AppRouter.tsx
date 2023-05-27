@@ -9,6 +9,7 @@ import RegisterContest from "../pages/RegisterContest";
 import Ranking from "../pages/Ranking";
 import Exercises from "../pages/exercises";
 import ProblemsOfContest from "../pages/ProblemsOfContest";
+import DetailProblem from "../pages/DetailProblem";
 
 function AppRouter() {
   return (
@@ -28,7 +29,7 @@ function AppRouter() {
       <Route path={"/ranking"} element={<Ranking />} />
       <Route path={"/problem"}>
         <Route path={"list"} element={<Exercises />} index={true} />
-        {/*<Route path={"detail/:idProblem"}/>*/}
+        <Route path={"detail/:idProblem/:idContest?"} element={<DetailProblem />} />
       </Route>
     </Routes>
   );

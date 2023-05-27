@@ -29,7 +29,7 @@ function ProblemsOfContest() {
               Số đội giải được <span className={"text-base"}>8</span>
             </p>
             <NavLink
-              to={"/problem/detail/problem-1-3"}
+              to={"/problem/detail/problem-1-3/question-1-2"}
               className={
                 "inline-block rounded-md bg-[#023e8a] px-5 py-1 text-base font-medium text-white duration-300 hover:bg-[#0077b6]"
               }
@@ -43,7 +43,7 @@ function ProblemsOfContest() {
               Số đội giải được <span className={"text-base"}>11</span>
             </p>
             <NavLink
-              to={"/problem/detail/problem-2-5"}
+              to={"/problem/detail/problem-2-5/question-1-2"}
               className={
                 "inline-block rounded-md bg-[#023e8a] px-5 py-1 text-base font-medium text-white duration-300 hover:bg-[#0077b6]"
               }
