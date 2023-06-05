@@ -5,6 +5,10 @@ import { AiFillPlusCircle } from "react-icons/all";
 import { useEffect, useState } from "react";
 import { IContest } from "../../types/contest.type";
 import { getContestById } from "../../Query/api/contest-service";
+import AddTeamModal from "../../components/Modal/AddTeamModal";
+import { ITeam, ITeamMemberDetail } from "../../types/team.type";
+import { getTeamList, getTeamMember } from "../../Query/api/team-service";
+import Swal from "sweetalert2";
 
 const getContestIdNumber = (id: string | undefined) => {
   let temp: string[] = [];
@@ -26,19 +30,47 @@ function RegisterContest() {
     duration: "",
     host_id: null
   };
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [contest, setContest] = useState<IContest>(initialContest);
+  const [teams, setTeams] = useState<ITeam[]>([]);
+  const [teamMemberDetails, setTeamMemberDetails] = useState<ITeamMemberDetail>([]);
 
   useEffect(() => {
     const contest_id = getContestIdNumber(contestId);
-    getContestById(contest_id).then((data) => {
-      if (data) {
-        setContest(data[0] ?? initialContest);
+    async function handleFetchData() {
+      Swal.fire({
+        title: "Đang lấy dữ liệu",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen() {
+          Swal.showLoading();
+        }
+      });
+      const dataContests = await getContestById(contest_id);
+      if (dataContests && dataContests.length !== 0) {
+        setContest(dataContests[0] ?? initialContest);
       }
-    });
+      const dataTeams = await getTeamList(contest_id);
+      let teamIds: number[] = [];
+      if (dataTeams && dataTeams.length !== 0) {
+        setTeams(dataTeams ?? []);
+        teamIds = dataTeams.map((team) => team.id);
+      }
+      const dateTeamMembers = await getTeamMember(teamIds);
+      if (dateTeamMembers && dateTeamMembers.length !== 0) {
+        setTeamMemberDetails(dateTeamMembers ?? []);
+      }
+      Swal.close();
+    }
+
+    handleFetchData();
   }, []);
 
-  const handleCreateTeam = () => {
-    return;
+  const openModal = () => {
+    setIsOpen(true);
+  };
+  const closeModal = () => {
+    setIsOpen(false);
   };
 
   return contest.id !== -1 ? (
@@ -69,34 +101,44 @@ function RegisterContest() {
             Diễn ra trong <span className={"text-base font-medium"}>{contest.duration}</span>
           </p>
           <p className={"col-span-3 text-sm font-normal text-black"}>Mô tả của cuộc thi</p>
-          <p className={"col-span-3 rounded-md border border-black bg-gray-50 p-2 text-sm font-normal text-black"}>
+          <p className={"col-span-3 rounded-md border border-gray-700 bg-gray-100 p-2 text-sm font-normal text-black"}>
             {contest.description}
           </p>
         </div>
         <div className={"mt-5 w-full p-3"}>
           <div className={"flex flex-row items-center justify-between"}>
-            <p className={"text-lg font-medium text-black"}>Danh sách các đội đã đăng ký</p>
+            <p className={"text-xl font-medium text-black"}>Danh sách các đội đã đăng ký</p>
             <button
               className={
                 "flex flex-row items-center gap-x-3 rounded-md bg-gray-200 px-4 py-2 shadow-md hover:bg-gray-300"
               }
-              onClick={handleCreateTeam}
+              onClick={openModal}
             >
               <span className={"text-lg font-medium"}>Tạo đội</span>{" "}
               <AiFillPlusCircle className={"inline-block h-6 w-6"} />
             </button>
           </div>
-          <ul className={"mt-3 grid grid-cols-3 gap-3"}>
-            <OverviewTeam />
-            <OverviewTeam />
-            <OverviewTeam />
-            <OverviewTeam />
-          </ul>
+          {teams && teams.length !== 0 ? (
+            <ul className={"mt-3 grid grid-cols-3 gap-3"}>
+              {teams.map((team) => (
+                <OverviewTeam
+                  key={`team-${team.id}`}
+                  teamId={team.id}
+                  name={team.name}
+                  teamMemberDetails={teamMemberDetails}
+                />
+              ))}
+            </ul>
+          ) : (
+            <p className={"mt-3 text-base font-normal"}>Chưa có đội đăng ký cho cuộc thi này</p>
+          )}
         </div>
       </div>
+      {isOpen && <AddTeamModal contestId={getContestIdNumber(contestId)} closeModal={closeModal} />}
     </div>
   ) : (
-    <div>
+    <div className={"flex w-full flex-col items-center"}>
+      <Header />
       <p>không lấy được id</p>
     </div>
   );

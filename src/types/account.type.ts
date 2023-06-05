@@ -1,8 +1,3 @@
-type IRoles = {
-  id: number;
-  name: string;
-};
-
 export type IAccount = {
   id: number;
   name: string;
@@ -13,7 +8,6 @@ export type IAccount = {
   birth_day: string | null;
   address: string | null;
   role_id: number;
-  roles: IRoles;
 };
 
 export type IFormValue = {

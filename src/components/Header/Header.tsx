@@ -18,7 +18,7 @@ function Header() {
   };
 
   return (
-    <div className={"sticky top-0 z-50 flex h-20 w-full items-center justify-between bg-gray-50 px-12 shadow-md"}>
+    <div className={"sticky top-0 z-30 flex h-20 w-full items-center justify-between bg-gray-50 px-12 shadow-md"}>
       <NavLink to={"/"}>
         <img src={logo} className={"ml-16 h-10 cursor-pointer"} alt={""} />
       </NavLink>

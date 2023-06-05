@@ -34,23 +34,14 @@ function Register() {
     });
   }, []);
 
-  const onSubmit: SubmitHandler<IFormValue> = (data) => {
-    const checkExist = accounts.find(
-      (account) => account.username === data.username && account.roles.name === "CANDIDATE"
-    );
-    if (checkExist) {
-      Swal.fire({
-        position: "center",
-        icon: "error",
-        title: "Thông báo",
-        text: "Tên đăng nhập đã được sử dụng",
-        allowOutsideClick: false,
-        showConfirmButton: true,
-        timer: 4000
-      });
-      return;
-    }
+  const checkAccountExist = (username: string | undefined) => {
+    if (!username) return "Vui lòng nhập tên đăng nhập";
 
+    const result = accounts.find((account) => account.username === username);
+    if (result) return "Tên đăng nhập đã được sử dụng";
+  };
+
+  const onSubmit: SubmitHandler<IFormValue> = (data) => {
     if (data.password !== data.rePassword) {
       return;
     }
@@ -129,7 +120,8 @@ function Register() {
               placeholder={"Tên đăng nhập"}
               {...register("username", {
                 required: "Vui lòng nhập tên đăng nhập",
-                minLength: { value: 6, message: "Tên đăng nhập phải có ít nhất 6 ký tự" }
+                minLength: { value: 6, message: "Tên đăng nhập phải có ít nhất 6 ký tự" },
+                validate: (value) => checkAccountExist(value)
               })}
             />
             {errors.username && <span className={"absolute text-xs text-red-600"}>{errors.username.message}</span>}

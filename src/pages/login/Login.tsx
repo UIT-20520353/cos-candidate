@@ -1,14 +1,12 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { useDispatch } from "react-redux";
 import { userLogin } from "./user.reducer";
-import { IAccount, IFormLoginValue } from "../../types/account.type";
-import { getAccountList } from "../../Query/api/account-services";
+import { IFormLoginValue } from "../../types/account.type";
+import { handleLogin } from "../../Query/api/account-services";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 function Login() {
-  const [accounts, setAccounts] = useState<IAccount[]>([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const {
@@ -17,44 +15,33 @@ function Login() {
     formState: { errors }
   } = useForm<IFormLoginValue>();
 
-  useEffect(() => {
-    getAccountList().then((data) => {
-      if (data) {
-        setAccounts(data ?? []);
+  const onSubmit: SubmitHandler<IFormLoginValue> = (data) => {
+    handleLogin(data).then((response) => {
+      if (response && response.length !== 0) {
+        sessionStorage.setItem("id", response[0].id.toString());
+        sessionStorage.setItem("name", response[0].name);
+        dispatch(userLogin({ id: response[0].id, name: response[0].name }));
+        navigate("/");
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Đăng nhập thành công",
+          showConfirmButton: true,
+          timer: 3000,
+          allowOutsideClick: false
+        });
+      } else {
+        Swal.fire({
+          position: "center",
+          icon: "error",
+          title: "Đăng nhập không thành công",
+          text: "Tên đăng nhập hoặc mật khẩu không chính xác",
+          showConfirmButton: true,
+          timer: 3000,
+          allowOutsideClick: false
+        });
       }
     });
-  }, []);
-
-  const onSubmit: SubmitHandler<IFormLoginValue> = (data) => {
-    const result = accounts.find((account) => {
-      return (
-        data.username === account.username && data.password === account.password && account.roles.name === "CANDIDATE"
-      );
-    });
-    if (result) {
-      sessionStorage.setItem("id", result.id.toString());
-      sessionStorage.setItem("name", result.name);
-      dispatch(userLogin({ id: result.id, name: result.name }));
-      navigate("/");
-      Swal.fire({
-        position: "center",
-        icon: "success",
-        title: "Đăng nhập thành công",
-        showConfirmButton: true,
-        timer: 3000,
-        allowOutsideClick: false
-      });
-    } else {
-      Swal.fire({
-        position: "center",
-        icon: "error",
-        title: "Đăng nhập không thành công",
-        text: "Tên đăng nhập hoặc mật khẩu không chính xác",
-        showConfirmButton: true,
-        timer: 4000,
-        allowOutsideClick: false
-      });
-    }
   };
 
   return (
