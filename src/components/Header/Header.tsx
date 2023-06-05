@@ -44,7 +44,7 @@ function Header() {
         >
           Danh sách cuộc thi
         </NavLink>
-        {user.id && (
+        {user.id !== -1 && (
           <NavLink
             className={({ isActive }) =>
               `border-b-[3px] font-sans text-lg font-medium duration-300 ease-linear hover:border-black ${
@@ -67,7 +67,7 @@ function Header() {
         >
           Bảng xếp hạng
         </NavLink>
-        {!user.id ? (
+        {user.id === -1 ? (
           <div className={"flex flex-row gap-x-3"}>
             <NavLink to={"/register"} className={"rounded-full px-4 py-2 text-base font-medium hover:text-[#0077b6]"}>
               Đăng ký

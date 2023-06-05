@@ -27,7 +27,9 @@ function Login() {
 
   const onSubmit: SubmitHandler<IFormLoginValue> = (data) => {
     const result = accounts.find((account) => {
-      return data.username === account.username && data.password === account.password;
+      return (
+        data.username === account.username && data.password === account.password && account.roles.name === "CANDIDATE"
+      );
     });
     if (result) {
       sessionStorage.setItem("id", result.id.toString());
@@ -54,35 +56,6 @@ function Login() {
       });
     }
   };
-
-  // const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault();
-  //   if (true) {
-  //     dispatch(userLogin({ id: "user-1-1", name: "Xuân Vương" }));
-  //
-  //     sessionStorage.setItem("id", "user-1-1");
-  //     sessionStorage.setItem("name", "Xuân Vương");
-  //
-  //     navigate("/", { replace: true });
-  //     Swal.fire({
-  //       position: "center",
-  //       icon: "success",
-  //       title: "Đăng nhập thành công",
-  //       showConfirmButton: false,
-  //       timer: 2000,
-  //       allowOutsideClick: false
-  //     });
-  //   } else {
-  //     Swal.fire({
-  //       position: "bottom-end",
-  //       icon: "error",
-  //       title: "Đăng nhập không thành công",
-  //       showConfirmButton: false,
-  //       timer: 2000,
-  //       toast: true
-  //     });
-  //   }
-  // };
 
   return (
     <div className={"flex h-screen items-center justify-center"}>

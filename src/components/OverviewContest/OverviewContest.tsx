@@ -39,7 +39,7 @@ function OverviewContest(props: IProps) {
   }, []);
 
   const handleRegisterContestClick = () => {
-    if (user.id) {
+    if (user.id !== -1) {
       navigate(`/contest/list/register/contest-${props.contest.id}`, { replace: true });
     } else {
       navigate("/login", { replace: true });
