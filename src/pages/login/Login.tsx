@@ -30,7 +30,7 @@ function Login() {
       return data.username === account.username && data.password === account.password;
     });
     if (result) {
-      sessionStorage.setItem("id", result.id);
+      sessionStorage.setItem("id", result.id.toString());
       sessionStorage.setItem("name", result.name);
       dispatch(userLogin({ id: result.id, name: result.name }));
       navigate("/");

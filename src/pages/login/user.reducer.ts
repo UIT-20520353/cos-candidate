@@ -2,7 +2,7 @@ import { IUser } from "../../types/user.type";
 import { createAction, createReducer } from "@reduxjs/toolkit";
 
 const initialState: IUser = {
-  id: "",
+  id: -1,
   name: ""
 };
 
@@ -17,7 +17,7 @@ const userReducer = createReducer(initialState, (builder) => {
       state.name = user.name;
     })
     .addCase(userLogout, (state) => {
-      state.id = "";
+      state.id = -1;
       state.name = "";
     });
 });

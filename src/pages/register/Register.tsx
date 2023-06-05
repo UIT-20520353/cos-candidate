@@ -6,7 +6,7 @@ import { isEmailValid } from "../../utils/ValidateEmail/ValidateEmail";
 import Swal from "sweetalert2";
 import { getAccountList, insertAccount } from "../../Query/api/account-services";
 
-const isPhoneNumberValid = (phoneNumber: string): boolean => {
+const isPhoneNumberValid = (phoneNumber: string | null): boolean | string => {
   if (!phoneNumber) return true;
 
   const phoneRegex = /^(03[2-9]|05[2689]|07[06-9]|08[1-9]|09[0-9])[0-9]{7}$/;
