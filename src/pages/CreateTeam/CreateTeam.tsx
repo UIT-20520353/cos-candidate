@@ -3,7 +3,7 @@ import { TiPlus } from "react-icons/all";
 import { FormEvent, useState } from "react";
 import FormCreateTeam from "../../components/FormCreateTeam";
 import Swal from "sweetalert2";
-import OverviewTeam from "../../components/OverviewTeam";
+// import OverviewTeam from "../../components/OverviewTeam";
 
 function CreateTeam() {
   const min = 1;
@@ -58,9 +58,7 @@ function CreateTeam() {
           )}
         </form>
         <p className={"mt-5 text-2xl font-medium text-[#10002b]"}>Các đội đã tham gia</p>
-        <ul className={"mt-5 grid grid-cols-3 gap-4"}>
-          <OverviewTeam />
-        </ul>
+        <ul className={"mt-5 grid grid-cols-3 gap-4"}>{/*<OverviewTeam />*/}</ul>
       </div>
     </div>
   );

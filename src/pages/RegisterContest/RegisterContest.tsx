@@ -33,7 +33,7 @@ function RegisterContest() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [contest, setContest] = useState<IContest>(initialContest);
   const [teams, setTeams] = useState<ITeam[]>([]);
-  const [teamMemberDetails, setTeamMemberDetails] = useState<ITeamMemberDetail>([]);
+  const [teamMemberDetails, setTeamMemberDetails] = useState<ITeamMemberDetail[]>([]);
 
   useEffect(() => {
     const contest_id = getContestIdNumber(contestId);
