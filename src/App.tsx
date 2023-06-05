@@ -7,8 +7,8 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (localStorage.getItem("id")) {
-      dispatch(userLogin({ id: localStorage.getItem("id") ?? "", name: localStorage.getItem("name") ?? "" }));
+    if (sessionStorage.getItem("id")) {
+      dispatch(userLogin({ id: sessionStorage.getItem("id") ?? "", name: sessionStorage.getItem("name") ?? "" }));
     }
   }, []);
 

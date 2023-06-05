@@ -11,8 +11,8 @@ function Header() {
   const navigate = useNavigate();
 
   const logout = () => {
-    localStorage.removeItem("id");
-    localStorage.removeItem("name");
+    sessionStorage.removeItem("id");
+    sessionStorage.removeItem("name");
     dispatch(userLogout());
     navigate("/", { replace: true });
   };
@@ -69,7 +69,9 @@ function Header() {
         </NavLink>
         {!user.id ? (
           <div className={"flex flex-row gap-x-3"}>
-            <button className={"rounded-full px-4 py-2 text-base font-medium hover:text-[#0077b6]"}>Đăng ký</button>
+            <NavLink to={"/register"} className={"rounded-full px-4 py-2 text-base font-medium hover:text-[#0077b6]"}>
+              Đăng ký
+            </NavLink>
             <NavLink
               to={"/login"}
               className={"rounded-full bg-[#0077b6] px-4 py-2 text-base font-medium text-white hover:bg-[#023e8a]"}

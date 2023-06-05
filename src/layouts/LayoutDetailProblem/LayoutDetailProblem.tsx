@@ -23,7 +23,7 @@ function LayoutDetailProblem() {
             Nộp bài
           </NavLink>
           <NavLink
-            to={"/"}
+            to={"/problem/detail/problem-2-5/question-1-2/submission/mine"}
             className={({ isActive }) => `${isActive ? "bg-gray-300" : ""} px-4 py-2 text-lg font-medium duration-300 `}
           >
             Các lần bạn nộp
