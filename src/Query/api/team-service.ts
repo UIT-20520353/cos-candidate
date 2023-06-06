@@ -1,7 +1,6 @@
 import { IFormTeamValue, ITeam, ITeamMember, ITeamMemberDetail } from "../../types/team.type";
 import supabase from "./supabase";
 import { PostgrestResponse } from "@supabase/supabase-js";
-import Swal from "sweetalert2";
 
 export async function insertTeam(team: IFormTeamValue) {
   try {

@@ -13,7 +13,7 @@ const getAmount = (teams: ITeam[], contestId: number) => {
 
 function Contests() {
   const [contests, setContests] = useState<IContest[]>([]);
-  const [teams, setTeams] = useState<ITeam>([]);
+  const [teams, setTeams] = useState<ITeam[]>([]);
 
   const handleFetchData = async () => {
     Swal.fire({
