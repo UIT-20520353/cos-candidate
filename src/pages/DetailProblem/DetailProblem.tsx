@@ -4,12 +4,10 @@ import Swal from "sweetalert2";
 import { IProblem } from "../../types/problem.type";
 import { getProblemsById } from "../../Query/api/problem-service";
 
-const getIdNumber = (contest_id: string) => {
-  let temp: string[] = [];
-  if (contest_id) {
-    temp = contest_id.split("-");
-  }
+const getIdNumber = (id: string | undefined) => {
+  if (!id) return -1;
 
+  const temp = id.split("-");
   return parseInt(temp[1]);
 };
 

@@ -1,12 +1,10 @@
 import Header from "../../components/Header";
 import { NavLink, Outlet, useParams } from "react-router-dom";
 
-const getContestIdNumber = (contest_id: string) => {
-  let temp: string[] = [];
-  if (contest_id) {
-    temp = contest_id.split("-");
-  }
+const getContestIdNumber = (contest_id: string | undefined) => {
+  if (!contest_id) return -1;
 
+  const temp = contest_id.split("-");
   return parseInt(temp[1]);
 };
 
