@@ -1,8 +1,17 @@
 import Header from "../../components/Header";
 import { NavLink, Outlet, useParams } from "react-router-dom";
 
+const getContestIdNumber = (contest_id: string) => {
+  let temp: string[] = [];
+  if (contest_id) {
+    temp = contest_id.split("-");
+  }
+
+  return parseInt(temp[1]);
+};
+
 function LayoutDetailProblem() {
-  const { idProblem, idContest } = useParams();
+  const { idProblem, idContest } = useParams<{ idProblem: string; idContest: string }>();
 
   return (
     <div className={"flex w-full flex-col items-center"}>
@@ -29,7 +38,7 @@ function LayoutDetailProblem() {
             Các lần bạn nộp
           </NavLink>
           <NavLink
-            to={`/contest/enter/${idContest}`}
+            to={`/contest/enter/${getContestIdNumber(idContest)}`}
             className={({ isActive }) => `${isActive ? "bg-gray-300" : ""} px-4 py-2 text-lg font-medium duration-300 `}
           >
             Quay lại cuộc thi

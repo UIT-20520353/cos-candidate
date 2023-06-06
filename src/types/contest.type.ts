@@ -24,3 +24,7 @@ export type IContest = {
   duration: string;
   host_id: number | null;
 };
+
+export type IContestId = {
+  contest_id: number;
+};

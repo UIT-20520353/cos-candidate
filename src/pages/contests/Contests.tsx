@@ -49,7 +49,12 @@ function Contests() {
         <p className={"text-2xl font-medium text-[#10002b]"}>Tất cả các cuộc thi</p>
         <ul className={"mt-5 grid grid-cols-3 gap-4"}>
           {contests.map((contest) => (
-            <OverviewContest amount={getAmount(teams, contest.id)} key={`contest-${contest.id}`} contest={contest} />
+            <OverviewContest
+              amount={getAmount(teams, contest.id)}
+              key={`contest-${contest.id}`}
+              contest={contest}
+              typeOverview={true}
+            />
           ))}
         </ul>
       </div>

@@ -1,6 +1,7 @@
-import { IFormTeamValue, ITeam, ITeamMember, ITeamMemberDetail } from "../../types/team.type";
+import { IFormTeamValue, ITeam, ITeamId, ITeamMember, ITeamMemberDetail } from "../../types/team.type";
 import supabase from "./supabase";
 import { PostgrestResponse } from "@supabase/supabase-js";
+import { IContestId } from "../../types/contest.type";
 
 export async function insertTeam(team: IFormTeamValue) {
   try {
@@ -25,14 +26,6 @@ export async function insertTeam(team: IFormTeamValue) {
 
 export async function handleCreateTeam(valueForm: IFormTeamValue, accountId: number) {
   try {
-    // Swal.fire({
-    //   title: "Đang tạo đội",
-    //   allowOutsideClick: false,
-    //   showConfirmButton: false,
-    //   didOpen() {
-    //     Swal.showLoading();
-    //   }
-    // });
     let team: ITeam = {
       id: 0,
       name: "",
@@ -54,7 +47,6 @@ export async function handleCreateTeam(valueForm: IFormTeamValue, accountId: num
       })
       .select("*")
       .then((response) => response as PostgrestResponse<ITeamMember>);
-    // Swal.close();
     if (error) {
       throw error;
     } else {
@@ -62,7 +54,6 @@ export async function handleCreateTeam(valueForm: IFormTeamValue, accountId: num
     }
   } catch (error) {
     console.error("Lỗi create team: ", error);
-    // Swal.close();
   }
 }
 
@@ -159,5 +150,40 @@ export async function getTeams() {
     }
   } catch (error) {
     console.error("Lỗi lấy danh sách đội: ", error);
+  }
+}
+
+export async function getTeamIds(account_id: number) {
+  try {
+    const { data, error }: PostgrestResponse<ITeamId> = await supabase
+      .from("team_members")
+      .select("team_id")
+      .eq("account_id", account_id)
+      .then((response) => response as PostgrestResponse<ITeamId>);
+
+    if (error) {
+      console.error("getTeamMemberIds: ", error);
+    } else {
+      return data;
+    }
+  } catch (error) {
+    console.error("getTeamMemberIds: ", error);
+  }
+}
+
+export async function getContestIds(teamIds: number[]) {
+  try {
+    const { data, error }: PostgrestResponse<IContestId> = await supabase
+      .from("teams")
+      .select("contest_id")
+      .in("id", teamIds)
+      .then((response) => response as PostgrestResponse<IContestId>);
+    if (error) {
+      console.error("getContestIds: ", error);
+    } else {
+      return data;
+    }
+  } catch (error) {
+    console.error("getContestIds: ", error);
   }
 }

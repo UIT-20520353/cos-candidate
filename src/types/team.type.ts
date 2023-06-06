@@ -26,3 +26,7 @@ type ITemp = {
 };
 
 export type ITeamMemberDetail = ITeamMember & ITemp;
+
+export type ITeamId = {
+  team_id: number;
+};

@@ -9,6 +9,7 @@ import { RootState } from "../../store";
 type IProps = {
   contest: IContest;
   amount: number;
+  typeOverview: boolean;
 };
 
 function OverviewContest(props: IProps) {
@@ -79,25 +80,40 @@ function OverviewContest(props: IProps) {
         <span className={"text-sm text-gray-500"}>{props.contest.duration}</span>
       </div>
       <div className={"mt-4 flex flex-row items-center gap-x-2"}>
-        {status !== "Đã kết thúc" && (
-          <button
-            className={
-              "w-44 rounded-md bg-[#0077b6] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
-            }
-            onClick={handleRegisterContestClick}
-          >
-            Đăng ký tham gia
-          </button>
-        )}
-        {status === "Đã kết thúc" && (
-          <NavLink
-            className={
-              "w-44 rounded-md bg-[#6c757d] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
-            }
-            to={"/"}
-          >
-            Kết quả
-          </NavLink>
+        {props.typeOverview ? (
+          <div>
+            {status !== "Đã kết thúc" && (
+              <button
+                className={
+                  "w-44 rounded-md bg-[#0077b6] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
+                }
+                onClick={handleRegisterContestClick}
+              >
+                Đăng ký tham gia
+              </button>
+            )}
+            {status === "Đã kết thúc" && (
+              <NavLink
+                className={
+                  "w-44 rounded-md bg-[#6c757d] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
+                }
+                to={"/"}
+              >
+                Kết quả
+              </NavLink>
+            )}
+          </div>
+        ) : (
+          <div>
+            <NavLink
+              className={
+                "inline-block w-44 rounded-md bg-[#0077b6] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
+              }
+              to={`/contest/enter/${props.contest.id}`}
+            >
+              Vào thi
+            </NavLink>
+          </div>
         )}
       </div>
     </li>

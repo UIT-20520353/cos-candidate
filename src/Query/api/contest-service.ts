@@ -4,19 +4,10 @@ import { IContest } from "../../types/contest.type";
 
 export async function getContestList() {
   try {
-    // Swal.fire({
-    //   title: "Đang lấy dữ liệu cuộc thi",
-    //   allowOutsideClick: false,
-    //   showConfirmButton: false,
-    //   didOpen() {
-    //     Swal.showLoading();
-    //   }
-    // });
     const { data, error }: PostgrestResponse<IContest> = await supabase
       .from("contests")
       .select("*")
       .then((response) => response as PostgrestResponse<IContest>);
-    // Swal.close();
     if (error) {
       throw error;
     } else {
@@ -24,7 +15,6 @@ export async function getContestList() {
     }
   } catch (error) {
     console.error("Lỗi khi lấy tất cả cuộc thi: ", error);
-    // Swal.close();
   }
 }
 
@@ -42,5 +32,22 @@ export async function getContestById(contestId: number) {
     }
   } catch (error) {
     console.error("Lỗi khi lấy cuộc thi bằng id: ", error);
+  }
+}
+
+export async function getContestsByContestIds(contestIds: number[]) {
+  try {
+    const { data, error }: PostgrestResponse<IContest> = await supabase
+      .from("contests")
+      .select("*")
+      .in("id", contestIds)
+      .then((response) => response as PostgrestResponse<IContest>);
+    if (error) {
+      console.error("getContestsByContestIds: ", error);
+    } else {
+      return data;
+    }
+  } catch (error) {
+    console.error("getContestsByContestIds: ", error);
   }
 }
