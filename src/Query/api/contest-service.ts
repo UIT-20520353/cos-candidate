@@ -1,23 +1,22 @@
 import supabase from "./supabase";
 import { PostgrestResponse } from "@supabase/supabase-js";
 import { IContest } from "../../types/contest.type";
-import Swal from "sweetalert2";
 
 export async function getContestList() {
   try {
-    Swal.fire({
-      title: "Đang lấy dữ liệu cuộc thi",
-      allowOutsideClick: false,
-      showConfirmButton: false,
-      didOpen() {
-        Swal.showLoading();
-      }
-    });
+    // Swal.fire({
+    //   title: "Đang lấy dữ liệu cuộc thi",
+    //   allowOutsideClick: false,
+    //   showConfirmButton: false,
+    //   didOpen() {
+    //     Swal.showLoading();
+    //   }
+    // });
     const { data, error }: PostgrestResponse<IContest> = await supabase
       .from("contests")
       .select("*")
       .then((response) => response as PostgrestResponse<IContest>);
-    Swal.close();
+    // Swal.close();
     if (error) {
       throw error;
     } else {
@@ -25,7 +24,7 @@ export async function getContestList() {
     }
   } catch (error) {
     console.error("Lỗi khi lấy tất cả cuộc thi: ", error);
-    Swal.close();
+    // Swal.close();
   }
 }
 

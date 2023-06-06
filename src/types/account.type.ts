@@ -8,6 +8,7 @@ export type IAccount = {
   birth_day: string | null;
   address: string | null;
   role_id: number;
+  host_id: number | null;
 };
 
 export type IFormValue = {

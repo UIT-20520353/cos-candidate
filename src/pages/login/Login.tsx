@@ -18,6 +18,7 @@ function Login() {
   const onSubmit: SubmitHandler<IFormLoginValue> = (data) => {
     handleLogin(data).then((response) => {
       if (response && response.length !== 0) {
+        console.log(response);
         sessionStorage.setItem("id", response[0].id.toString());
         sessionStorage.setItem("name", response[0].name);
         dispatch(userLogin({ id: response[0].id, name: response[0].name }));
@@ -27,6 +28,7 @@ function Login() {
           icon: "success",
           title: "Đăng nhập thành công",
           showConfirmButton: true,
+          confirmButtonText: "Đồng ý",
           timer: 3000,
           allowOutsideClick: false
         });

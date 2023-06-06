@@ -9,6 +9,8 @@ import AddTeamModal from "../../components/Modal/AddTeamModal";
 import { ITeam, ITeamMemberDetail } from "../../types/team.type";
 import { getTeamList, getTeamMember } from "../../Query/api/team-service";
 import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 
 const getContestIdNumber = (id: string | undefined) => {
   let temp: string[] = [];
@@ -21,6 +23,7 @@ const getContestIdNumber = (id: string | undefined) => {
 
 function RegisterContest() {
   const { contestId } = useParams<{ contestId: string }>();
+  const user = useSelector((state: RootState) => state.user);
   const initialContest: IContest = {
     id: getContestIdNumber(contestId),
     name: "",
@@ -35,9 +38,8 @@ function RegisterContest() {
   const [teams, setTeams] = useState<ITeam[]>([]);
   const [teamMemberDetails, setTeamMemberDetails] = useState<ITeamMemberDetail[]>([]);
 
-  useEffect(() => {
-    const contest_id = getContestIdNumber(contestId);
-    async function handleFetchData() {
+  async function handleFetchData(type: string) {
+    if (type === "all")
       Swal.fire({
         title: "Đang lấy dữ liệu",
         allowOutsideClick: false,
@@ -46,31 +48,55 @@ function RegisterContest() {
           Swal.showLoading();
         }
       });
-      const dataContests = await getContestById(contest_id);
+    const contest_id = getContestIdNumber(contestId);
+    const dataContests = await getContestById(contest_id);
+    if (type === "all")
       if (dataContests && dataContests.length !== 0) {
         setContest(dataContests[0] ?? initialContest);
       }
-      const dataTeams = await getTeamList(contest_id);
-      let teamIds: number[] = [];
-      if (dataTeams && dataTeams.length !== 0) {
-        setTeams(dataTeams ?? []);
-        teamIds = dataTeams.map((team) => team.id);
-      }
-      const dateTeamMembers = await getTeamMember(teamIds);
-      if (dateTeamMembers && dateTeamMembers.length !== 0) {
-        setTeamMemberDetails(dateTeamMembers ?? []);
-      }
-      Swal.close();
+    const dataTeams = await getTeamList(contest_id);
+    let teamIds: number[] = [];
+    if (dataTeams && dataTeams.length !== 0) {
+      setTeams(dataTeams ?? []);
+      teamIds = dataTeams.map((team) => team.id);
     }
+    const dateTeamMembers = await getTeamMember(teamIds);
+    if (dateTeamMembers && dateTeamMembers.length !== 0) {
+      setTeamMemberDetails(dateTeamMembers ?? []);
+    }
+    if (type === "all") Swal.close();
+  }
 
-    handleFetchData();
+  useEffect(() => {
+    handleFetchData("all");
   }, []);
 
   const openModal = () => {
+    const result = teamMemberDetails.find((dataTeamMember) => dataTeamMember.account_id === user.id);
+
+    if (result) {
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        title: "Thông báo",
+        text: "Bạn đã tham gia đội, vui lòng rời đội trước khi tạo đội mới",
+        showConfirmButton: true,
+        confirmButtonText: "Đồng ý",
+        allowOutsideClick: false
+      });
+      return;
+    }
+
     setIsOpen(true);
   };
   const closeModal = () => {
+    handleFetchData("none");
     setIsOpen(false);
+  };
+  const updateList = () => {
+    setTeams([]);
+    setTeamMemberDetails([]);
+    handleFetchData("none");
   };
 
   return contest.id !== -1 ? (
@@ -126,6 +152,8 @@ function RegisterContest() {
                   teamId={team.id}
                   name={team.name}
                   teamMemberDetails={teamMemberDetails}
+                  updateList={updateList}
+                  max_member={team.max_member}
                 />
               ))}
             </ul>

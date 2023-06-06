@@ -26,14 +26,14 @@ export async function insertTeam(team: IFormTeamValue) {
 
 export async function handleCreateTeam(valueForm: IFormTeamValue, accountId: number) {
   try {
-    Swal.fire({
-      title: "Đang tạo đội",
-      allowOutsideClick: false,
-      showConfirmButton: false,
-      didOpen() {
-        Swal.showLoading();
-      }
-    });
+    // Swal.fire({
+    //   title: "Đang tạo đội",
+    //   allowOutsideClick: false,
+    //   showConfirmButton: false,
+    //   didOpen() {
+    //     Swal.showLoading();
+    //   }
+    // });
     let team: ITeam = {
       id: 0,
       name: "",
@@ -55,7 +55,7 @@ export async function handleCreateTeam(valueForm: IFormTeamValue, accountId: num
       })
       .select("*")
       .then((response) => response as PostgrestResponse<ITeamMember>);
-    Swal.close();
+    // Swal.close();
     if (error) {
       throw error;
     } else {
@@ -63,7 +63,7 @@ export async function handleCreateTeam(valueForm: IFormTeamValue, accountId: num
     }
   } catch (error) {
     console.error("Lỗi create team: ", error);
-    Swal.close();
+    // Swal.close();
   }
 }
 
@@ -98,5 +98,67 @@ export async function getTeamMember(teamIds: number[]) {
     }
   } catch (error) {
     console.error("Lỗi get team member: ", error);
+  }
+}
+
+export async function handleJoinTeamAPI(teamId: number, accountId: number) {
+  try {
+    const { data, error } = await supabase
+      .from("team_members")
+      .insert({
+        team_id: teamId,
+        account_id: accountId,
+        is_leader: false
+      })
+      .select("*");
+    if (error) {
+      console.error("Lỗi join team: ", error);
+    } else {
+      return data;
+    }
+  } catch (error) {
+    console.error("Lỗi join team: ", error);
+  }
+}
+
+export async function handleLeaveTeamAPI(id: number) {
+  try {
+    const { data, error } = await supabase.from("team_members").delete().eq("id", id).select("*");
+    if (error) {
+      console.error("Lỗi leave team: ", error);
+    } else {
+      return data;
+    }
+  } catch (error) {
+    console.error("Lỗi leave team: ", error);
+  }
+}
+
+export async function handleDeleteTeam(teamId: number) {
+  try {
+    const { data, error } = await supabase.from("teams").delete().eq("id", teamId).select("*");
+    if (error) {
+      console.error("Lỗi delete team: ", error);
+    } else {
+      return data;
+    }
+  } catch (error) {
+    console.error("Lỗi delete team: ", error);
+  }
+}
+
+export async function getTeams() {
+  try {
+    const { data, error }: PostgrestResponse<ITeam> = await supabase
+      .from("teams")
+      .select("*")
+      .then((response) => response as PostgrestResponse<ITeam>);
+    if (error) {
+      console.error("Lỗi lấy danh sách đội: ", error);
+    } else {
+      return data;
+    }
+  } catch (error) {
+    console.error("Lỗi lấy danh sách đội: ", error);
   }
 }
