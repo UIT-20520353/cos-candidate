@@ -37,7 +37,7 @@ function ProfilePage() {
     if (data && data.length !== 0) {
       setValue("name", data[0].name);
       setValue("phone", data[0].phone);
-      setValue("email", data[0].email);
+      setValue("email", data[0].email ?? "");
       setValue("address", data[0].address);
     }
 
@@ -64,8 +64,8 @@ function ProfilePage() {
           parseInt(sessionStorage.getItem("id") ?? "-1"),
           data.name,
           data.email,
-          data.phone,
-          data.address
+          data.phone ?? "",
+          data.address ?? ""
         ).then((res) => {
           if (res) {
             Swal.fire({
