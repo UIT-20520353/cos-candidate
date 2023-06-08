@@ -1,5 +1,5 @@
 import Header from "../../components/Header";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getContestIds, getTeamIds, getTeams } from "../../Query/api/team-service";
 import Swal from "sweetalert2";
 import { IContest } from "../../types/contest.type";

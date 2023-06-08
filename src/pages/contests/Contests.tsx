@@ -1,7 +1,7 @@
 import Header from "../../components/Header";
 import OverviewContest from "../../components/OverviewContest";
 import { IContest } from "../../types/contest.type";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getContestList } from "../../Query/api/contest-service";
 import Swal from "sweetalert2";
 import { ITeam } from "../../types/team.type";

@@ -1,7 +1,6 @@
-import React from "react";
 import Header from "../../../components/Header";
 
-function RankContest(props) {
+function RankContest() {
   return (
     <div className={"flex w-full flex-col items-center"}>
       <Header />
