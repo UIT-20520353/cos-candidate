@@ -8,8 +8,8 @@ type IProps = {
 type ValueType<OptionType> = OptionType | OptionType[] | null | undefined;
 function LanguagesDropdown(props: IProps) {
   const handleLanguageChange = (selectedOption: ValueType<ILanguageOption>) => {
-    const selectedLanguages = selectedOption as ILanguageOption[];
-    props.onSelectChange(selectedLanguages);
+    const selectedLanguage = selectedOption as ILanguageOption;
+    props.onSelectChange(selectedLanguage);
   };
 
   return (
