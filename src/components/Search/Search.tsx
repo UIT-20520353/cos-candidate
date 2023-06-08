@@ -7,7 +7,7 @@ type IProps = {
 function Search(props: IProps) {
   const inputSearchRef = useRef<HTMLInputElement>(null);
   const handleSearchClick = () => {
-    if (!inputSearchRef) return;
+    if (!inputSearchRef.current) return;
     props.handleSearch(inputSearchRef.current.value);
   };
 
