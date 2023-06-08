@@ -1,5 +1,5 @@
 export const customStyles = {
-  control: (styles) => ({
+  control: (styles: object) => ({
     ...styles,
     width: "100%",
     maxWidth: "14rem",
@@ -12,7 +12,7 @@ export const customStyles = {
     cursor: "pointer",
     border: "2px solid #000000"
   }),
-  option: (styles) => {
+  option: (styles: object) => {
     return {
       ...styles,
       color: "#000",
@@ -27,7 +27,7 @@ export const customStyles = {
       }
     };
   },
-  menu: (styles) => {
+  menu: (styles: object) => {
     return {
       ...styles,
       backgroundColor: "#fff",
@@ -38,7 +38,7 @@ export const customStyles = {
     };
   },
 
-  placeholder: (defaultStyles) => {
+  placeholder: (defaultStyles: object) => {
     return {
       ...defaultStyles,
       color: "#000",

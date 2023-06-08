@@ -57,7 +57,7 @@ function SubmitPage() {
     };
 
     try {
-      return await axios.request<IResponseSubmission>(options);
+      return await axios.request<IResponseSubmission, any>(options);
     } catch (err) {
       console.log(err);
     }
@@ -74,7 +74,12 @@ function SubmitPage() {
       }
     });
 
-    const problem: IProblem[] = await getProblemsById(getIdNumber(idProblem));
+    const problem: IProblem[] | undefined = await getProblemsById(getIdNumber(idProblem));
+    if (!problem) {
+      Swal.close();
+      return;
+    }
+
     const response = await compileCode(problem[0].example_input);
 
     if (response.data.error !== "") {

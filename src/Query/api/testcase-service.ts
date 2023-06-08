@@ -2,7 +2,7 @@ import { PostgrestResponse } from "@supabase/supabase-js";
 import { ITestcase } from "../../types/testcase.type";
 import supabase from "./supabase";
 
-export async function getTestcaseList(problem_id: number): Promise<ITestcase> {
+export async function getTestcaseList(problem_id: number) {
   try {
     const { data, error }: PostgrestResponse<ITestcase> = await supabase
       .from("testcases")

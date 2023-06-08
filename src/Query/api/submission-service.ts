@@ -36,7 +36,7 @@ export async function insertSubmission(
   }
 }
 
-export async function getListSubmissions(problem_id: number, account_id: number): ISubmission {
+export async function getListSubmissions(problem_id: number, account_id: number) {
   try {
     const { data, error }: PostgrestResponse<ISubmission> = await supabase
       .from("submissions")
