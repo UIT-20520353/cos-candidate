@@ -11,7 +11,9 @@ type IProps = {
 function CodeEditor(props: IProps) {
   const [value, setValue] = useState(props.code || "");
 
-  const handleEditorChange = (value: string) => {
+  const handleEditorChange = (value: string | undefined) => {
+    if (!value) return;
+
     setValue(value);
     if (props.onChange) props.onChange("code", value);
   };

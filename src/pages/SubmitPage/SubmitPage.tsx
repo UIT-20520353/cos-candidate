@@ -60,6 +60,7 @@ function SubmitPage() {
       return await axios.request<IResponseSubmission, any>(options);
     } catch (err) {
       console.log(err);
+      return err;
     }
   };
 
@@ -106,7 +107,19 @@ function SubmitPage() {
       return;
     }
 
-    const testcases: ITestcase[] = await getTestcaseList(getIdNumber(idProblem));
+    const testcases: ITestcase[] | undefined = await getTestcaseList(getIdNumber(idProblem));
+    if (!testcases) {
+      await insertSubmission(
+        "Accepted",
+        language.label,
+        code,
+        getIdNumber(idProblem),
+        parseInt(sessionStorage.getItem("id") ?? "-1")
+      );
+      Swal.close();
+      return;
+    }
+
     for (const testcase of testcases) {
       const res = await compileCode(testcase.input);
 

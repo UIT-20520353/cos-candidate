@@ -18,7 +18,8 @@ export const languageOptions: ILanguageOption[] = [
     id: 2,
     name: "Python",
     label: "Python",
-    value: "py"
+    value: "py",
+    valueForCodeEditor: "python"
   },
   {
     id: 3,
