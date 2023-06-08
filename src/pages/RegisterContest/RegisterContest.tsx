@@ -11,6 +11,7 @@ import { getTeamList, getTeamMember } from "../../Query/api/team-service";
 import Swal from "sweetalert2";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
+import Search from "../../components/Search";
 
 const getContestIdNumber = (id: string | undefined) => {
   let temp: string[] = [];
@@ -36,6 +37,7 @@ function RegisterContest() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [contest, setContest] = useState<IContest>(initialContest);
   const [teams, setTeams] = useState<ITeam[]>([]);
+  const [filterTeams, setFilterTeams] = useState<ITeam[]>([]);
   const [teamMemberDetails, setTeamMemberDetails] = useState<ITeamMemberDetail[]>([]);
 
   async function handleFetchData(type: string) {
@@ -58,6 +60,7 @@ function RegisterContest() {
     let teamIds: number[] = [];
     if (dataTeams && dataTeams.length !== 0) {
       setTeams(dataTeams ?? []);
+      setFilterTeams(dataTeams ?? []);
       teamIds = dataTeams.map((team) => team.id);
     }
     const dateTeamMembers = await getTeamMember(teamIds);
@@ -97,6 +100,21 @@ function RegisterContest() {
     setTeams([]);
     setTeamMemberDetails([]);
     handleFetchData("none");
+  };
+
+  const handleSearch = (filtered: string) => {
+    if (!filtered) {
+      const temp = [...teams];
+      setFilterTeams(temp);
+      return;
+    }
+
+    const result = teams.filter((team) => {
+      const teamName = team.name.toUpperCase();
+      return teamName.includes(filtered.toUpperCase());
+    });
+    console.log(result);
+    setFilterTeams(result);
   };
 
   return contest.id !== -1 ? (
@@ -144,9 +162,10 @@ function RegisterContest() {
               <AiFillPlusCircle className={"inline-block h-6 w-6"} />
             </button>
           </div>
-          {teams && teams.length !== 0 ? (
+          <Search handleSearch={handleSearch} placeHolder={"Nhập tên đội"} />
+          {filterTeams && filterTeams.length !== 0 ? (
             <ul className={"mt-3 grid grid-cols-3 gap-3"}>
-              {teams.map((team) => (
+              {filterTeams.map((team) => (
                 <OverviewTeam
                   key={`team-${team.id}`}
                   teamId={team.id}

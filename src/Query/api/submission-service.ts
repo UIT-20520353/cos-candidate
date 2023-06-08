@@ -53,3 +53,19 @@ export async function getListSubmissions(problem_id: number, account_id: number)
     console.error("getListSubmissions: ", error);
   }
 }
+
+export async function getAllSubmission() {
+  try {
+    const { data, error }: PostgrestResponse<ISubmission> = await supabase
+      .from("submissions")
+      .select("*")
+      .then((response) => response as PostgrestResponse<ISubmission>);
+    if (error) {
+      console.error("getAllSubmission: ", error);
+    } else {
+      return data;
+    }
+  } catch (error) {
+    console.error("getAllSubmission: ", error);
+  }
+}

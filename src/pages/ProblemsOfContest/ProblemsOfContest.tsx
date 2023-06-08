@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { IProblem } from "../../types/problem.type";
 import { getProblemsByContestId } from "../../Query/api/problem-service";
 import OverviewProblem from "../../components/OverviewProblem";
+import Search from "../../components/Search";
 
 const getContestIdNumber = (id: string | undefined) => {
   if (!id) return -1;
@@ -28,6 +29,7 @@ function ProblemsOfContest() {
   };
   const [contest, setContest] = useState<IContest>(initialContest);
   const [problems, setProblems] = useState<IProblem[]>([]);
+  const [filterProblems, setFilterProblems] = useState<IProblem[]>([]);
 
   const handleFetchData = async () => {
     Swal.fire({
@@ -47,6 +49,7 @@ function ProblemsOfContest() {
     const dataProblems = await getProblemsByContestId(contest_id);
     if (dataProblems && dataProblems.length !== 0) {
       setProblems(dataProblems ?? []);
+      setFilterProblems(dataProblems ?? []);
     }
 
     Swal.close();
@@ -55,6 +58,20 @@ function ProblemsOfContest() {
   useEffect(() => {
     handleFetchData();
   }, []);
+
+  const handleSearch = (filtered: string) => {
+    if (!filtered) {
+      const temp = [...problems];
+      setFilterProblems(temp);
+      return;
+    }
+
+    const result = problems.filter((problem) => {
+      const problemName = problem.name.toUpperCase();
+      return problemName.includes(filtered.toUpperCase());
+    });
+    setFilterProblems(result);
+  };
 
   return (
     <div className={"flex w-full flex-col items-center"}>
@@ -70,8 +87,10 @@ function ProblemsOfContest() {
           </NavLink>
         </div>
 
+        <Search handleSearch={handleSearch} placeHolder={"Nhập tên bài"} />
+
         <ul className={"mt-5 grid w-full grid-cols-3 gap-3"}>
-          {problems.map((problem) => (
+          {filterProblems.map((problem) => (
             <OverviewProblem key={`problem-${problem.id}`} problem={problem} />
           ))}
         </ul>

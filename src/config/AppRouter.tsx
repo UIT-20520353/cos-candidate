@@ -15,11 +15,13 @@ import ListSubmission from "../pages/ListSubmission";
 import Register from "../pages/register";
 import SubmitPage from "../pages/SubmitPage";
 import RankContest from "../pages/Ranking/RankContest";
+import ProfilePage from "../pages/ProfilePage";
 
 function AppRouter() {
   return (
     <Routes>
       <Route path={"/"} element={<Dashboard />} />
+      <Route path={"/profile"} element={<ProfilePage />} />
       <Route path={"/login"} element={<Login />} />
       <Route path={"/register"} element={<Register />} />
       <Route path={"/contest"}>
@@ -30,8 +32,8 @@ function AppRouter() {
       </Route>
       <Route path={"/reset-password"} element={<ResetPassword />} />
       <Route path={"/contest/list/registered"}>
-        <Route index={true} element={<StartContest />}></Route>
-        <Route path={"create"} element={<CreateTeam />}></Route>
+        <Route index={true} element={<StartContest />} />
+        <Route path={"create"} element={<CreateTeam />} />
       </Route>
       <Route path={"/ranking"} element={<Ranking />} />
       <Route path={"/problem"}>

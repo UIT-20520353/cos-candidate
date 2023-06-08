@@ -2,6 +2,7 @@ import { useRef } from "react";
 
 type IProps = {
   handleSearch: (value: string) => void;
+  placeHolder: string;
 };
 
 function Search(props: IProps) {
@@ -20,7 +21,7 @@ function Search(props: IProps) {
           "min-h-[50px] w-1/3 rounded-[6px_0_0_6px] border border-solid border-[#5e4dcd] bg-transparent px-4 py-0 text-[15px] text-black focus:border-[#3898EC] focus:outline-none"
         }
         id={"search-input"}
-        placeholder="Nhập tên cuộc thi"
+        placeholder={props.placeHolder}
         autoComplete="off"
       />
       <button

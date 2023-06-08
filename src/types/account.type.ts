@@ -25,3 +25,9 @@ export type IFormLoginValue = {
   username: string;
   password: string;
 };
+
+export type IFormChangePassword = {
+  oldPassword: string;
+  newPassword: string;
+  rePassword: string;
+};

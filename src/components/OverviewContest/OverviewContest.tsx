@@ -106,24 +106,24 @@ function OverviewContest(props: IProps) {
         ) : (
           <div>
             {status === "Đang diễn ra" && (
-              <>
-                <NavLink
-                  className={
-                    "mr-3 inline-block w-44 rounded-md bg-[#0077b6] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
-                  }
-                  to={`/contest/enter/contest-${props.contest.id}`}
-                >
-                  Vào thi
-                </NavLink>
-                <NavLink
-                  className={
-                    "inline-block w-44 rounded-md bg-[#6c757d] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
-                  }
-                  to={`/contest/ranking/${props.contest.id}`}
-                >
-                  Kết quả
-                </NavLink>
-              </>
+              <NavLink
+                className={
+                  "mr-3 inline-block w-44 rounded-md bg-[#0077b6] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
+                }
+                to={`/contest/enter/contest-${props.contest.id}`}
+              >
+                Vào thi
+              </NavLink>
+            )}
+            {(status === "Đang diễn ra" || status === "Đã kết thúc") && (
+              <NavLink
+                className={
+                  "inline-block w-44 rounded-md bg-[#6c757d] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
+                }
+                to={`/contest/ranking/${props.contest.id}`}
+              >
+                Kết quả
+              </NavLink>
             )}
           </div>
         )}

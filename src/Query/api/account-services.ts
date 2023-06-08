@@ -75,3 +75,61 @@ export async function handleLogin(account: IFormLoginValue) {
     Swal.close();
   }
 }
+
+export async function updateAccount(id: number, name: string, email: string, phone: string, address: string) {
+  try {
+    const { data, error } = await supabase
+      .from("accounts")
+      .update({
+        name,
+        email,
+        phone,
+        address
+      })
+      .eq("id", id)
+      .select("*");
+    if (error) {
+      console.error("updateAccount: ", error);
+    } else {
+      return data;
+    }
+  } catch (error) {
+    console.error("updateAccount: ", error);
+  }
+}
+
+export async function getAccountInfo(id: number) {
+  try {
+    const { data, error }: PostgrestResponse<IAccount> = await supabase
+      .from("accounts")
+      .select("*")
+      .eq("id", id)
+      .then((res) => res as PostgrestResponse<IAccount>);
+    if (error) {
+      console.error("getAccountInfo: ", error);
+    } else {
+      return data;
+    }
+  } catch (error) {
+    console.error("getAccountInfo: ", error);
+  }
+}
+
+export async function changePassword(id: number, password: string) {
+  try {
+    const { data, error } = await supabase
+      .from("accounts")
+      .update({
+        password
+      })
+      .eq("id", id)
+      .select("*");
+    if (error) {
+      console.error("changePassword: ", error);
+    } else {
+      return data;
+    }
+  } catch (error) {
+    console.error("changePassword: ", error);
+  }
+}

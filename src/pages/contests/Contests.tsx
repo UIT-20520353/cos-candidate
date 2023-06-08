@@ -64,7 +64,7 @@ function Contests() {
       <Header />
       <div className={"my-8 w-4/5"}>
         <p className={"text-2xl font-medium text-[#10002b]"}>Tất cả các cuộc thi</p>
-        <Search handleSearch={handleSearch} />
+        <Search placeHolder={"Nhập tên cuộc thi"} handleSearch={handleSearch} />
         <ul className={"mt-5 grid grid-cols-3 gap-4"}>
           {filterContests.map((contest) => (
             <OverviewContest
