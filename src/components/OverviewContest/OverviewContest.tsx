@@ -85,19 +85,19 @@ function OverviewContest(props: IProps) {
             {status !== "Đã kết thúc" && (
               <button
                 className={
-                  "w-44 rounded-md bg-[#0077b6] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
+                  "mr-3 w-44 rounded-md bg-[#0077b6] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
                 }
                 onClick={handleRegisterContestClick}
               >
                 Đăng ký tham gia
               </button>
             )}
-            {status === "Đã kết thúc" && (
+            {(status === "Đã kết thúc" || status === "Đang diễn ra") && (
               <NavLink
                 className={
                   "inline-block w-44 rounded-md bg-[#6c757d] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
                 }
-                to={"/"}
+                to={`/contest/ranking/${props.contest.id}`}
               >
                 Kết quả
               </NavLink>
@@ -109,7 +109,7 @@ function OverviewContest(props: IProps) {
               <>
                 <NavLink
                   className={
-                    "inline-block w-44 rounded-md bg-[#0077b6] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
+                    "mr-3 inline-block w-44 rounded-md bg-[#0077b6] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
                   }
                   to={`/contest/enter/contest-${props.contest.id}`}
                 >
@@ -119,7 +119,7 @@ function OverviewContest(props: IProps) {
                   className={
                     "inline-block w-44 rounded-md bg-[#6c757d] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
                   }
-                  to={"/"}
+                  to={`/contest/ranking/${props.contest.id}`}
                 >
                   Kết quả
                 </NavLink>

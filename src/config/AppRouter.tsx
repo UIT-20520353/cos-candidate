@@ -14,6 +14,7 @@ import LayoutDetailProblem from "../layouts/LayoutDetailProblem";
 import ListSubmission from "../pages/ListSubmission";
 import Register from "../pages/register";
 import SubmitPage from "../pages/SubmitPage";
+import RankContest from "../pages/Ranking/RankContest";
 
 function AppRouter() {
   return (
@@ -25,6 +26,7 @@ function AppRouter() {
         <Route index={true} path={"list"} element={<Contests />} />
         <Route path={"list/register/:contestId"} element={<RegisterContest />} />
         <Route path={"enter/:id"} element={<ProblemsOfContest />} />
+        <Route path={"ranking/:idContest"} element={<RankContest />} />
       </Route>
       <Route path={"/reset-password"} element={<ResetPassword />} />
       <Route path={"/contest/list/registered"}>
