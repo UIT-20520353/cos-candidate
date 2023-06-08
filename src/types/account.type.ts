@@ -15,7 +15,7 @@ export type IFormValue = {
   name: string;
   username: string;
   password: string;
-  email: string | null;
+  email: string;
   phone: string | null;
   address: string | null;
   rePassword: string;
