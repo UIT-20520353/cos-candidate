@@ -60,7 +60,7 @@ function SubmitPage() {
       return await axios.request<IResponseSubmission, any>(options);
     } catch (err) {
       console.log(err);
-      return err;
+      return err as IResponseSubmission;
     }
   };
 
