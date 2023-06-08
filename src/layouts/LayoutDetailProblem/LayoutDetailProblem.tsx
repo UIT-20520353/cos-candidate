@@ -1,13 +1,6 @@
 import Header from "../../components/Header";
 import { NavLink, Outlet, useParams } from "react-router-dom";
 
-const getContestIdNumber = (contest_id: string | undefined) => {
-  if (!contest_id) return -1;
-
-  const temp = contest_id.split("-");
-  return parseInt(temp[1]);
-};
-
 function LayoutDetailProblem() {
   const { idProblem, idContest } = useParams<{ idProblem: string; idContest: string }>();
 
@@ -24,19 +17,19 @@ function LayoutDetailProblem() {
             Đề bài
           </NavLink>
           <NavLink
-            to={"/problem/detail/problem-1-3/question-1-2/submit"}
+            to={`/problem/detail/${idProblem}/${idContest}/submit`}
             className={({ isActive }) => `${isActive ? "bg-gray-300" : ""} px-4 py-2 text-lg font-medium duration-300 `}
           >
             Nộp bài
           </NavLink>
           <NavLink
-            to={"/problem/detail/problem-2-5/question-1-2/submission/mine"}
+            to={`/problem/detail/${idProblem}/${idContest}/submission/mine`}
             className={({ isActive }) => `${isActive ? "bg-gray-300" : ""} px-4 py-2 text-lg font-medium duration-300 `}
           >
             Các lần bạn nộp
           </NavLink>
           <NavLink
-            to={`/contest/enter/${getContestIdNumber(idContest)}`}
+            to={`/contest/enter/${idContest}`}
             className={({ isActive }) => `${isActive ? "bg-gray-300" : ""} px-4 py-2 text-lg font-medium duration-300 `}
           >
             Quay lại cuộc thi

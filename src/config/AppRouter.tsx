@@ -10,10 +10,10 @@ import Ranking from "../pages/Ranking";
 import Exercises from "../pages/exercises";
 import ProblemsOfContest from "../pages/ProblemsOfContest";
 import DetailProblem from "../pages/DetailProblem";
-import CodeEditor from "../components/CodeEditor";
 import LayoutDetailProblem from "../layouts/LayoutDetailProblem";
 import ListSubmission from "../pages/ListSubmission";
 import Register from "../pages/register";
+import SubmitPage from "../pages/SubmitPage";
 
 function AppRouter() {
   return (
@@ -37,7 +37,7 @@ function AppRouter() {
         <Route path={"detail/:idProblem"} element={<LayoutDetailProblem />}>
           <Route path={":idContest"}>
             <Route index={true} element={<DetailProblem />} />
-            <Route path={"submit"} element={<CodeEditor />} />
+            <Route path={"submit"} element={<SubmitPage />} />
             <Route path={"submission/mine"} element={<ListSubmission />} />
           </Route>
         </Route>

@@ -8,6 +8,13 @@ import { IProblem } from "../../types/problem.type";
 import { getProblemsByContestId } from "../../Query/api/problem-service";
 import OverviewProblem from "../../components/OverviewProblem";
 
+const getContestIdNumber = (id: string | undefined) => {
+  if (!id) return -1;
+
+  const temp = id.split("-");
+  return parseInt(temp[1]);
+};
+
 function ProblemsOfContest() {
   const { id } = useParams<{ id: string }>();
   const initialContest: IContest = {
@@ -32,7 +39,7 @@ function ProblemsOfContest() {
       }
     });
 
-    const contest_id = parseInt(id ?? "-1");
+    const contest_id = getContestIdNumber(id);
     const contests = await getContestById(contest_id);
     if (contests && contests.length !== 0) {
       setContest(contests[0] ?? initialContest);
