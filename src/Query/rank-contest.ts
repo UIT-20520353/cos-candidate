@@ -46,6 +46,6 @@ export async function fetchDataRankContest(
     return { problems, teams, result };
   } catch (error) {
     console.error("fetchDataRankContest: ", error);
-    return [];
+    return { problems: [], teams: [], result: {} };
   }
 }

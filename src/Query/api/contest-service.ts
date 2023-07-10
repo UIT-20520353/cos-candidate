@@ -1,22 +1,6 @@
 import supabase from "./supabase";
 import { PostgrestResponse } from "@supabase/supabase-js";
-import { getContestStatus } from "~/utils";
 import { IAllContest, IContest, IContestDashboard, IContestForRanking } from "~/types";
-
-export async function getRegisteredContestList(userId: number, searchText: string): Promise<IContest> {
-  try {
-    const { data, error }: PostgrestResponse<IContest> = await supabase
-      .rpc("get_registered_contest_list", { candidate_id: userId, search_text: searchText })
-      .then((response) => response as PostgrestResponse<IContest>);
-    if (error) {
-      throw error;
-    } else {
-      return data;
-    }
-  } catch (error) {
-    console.error("Lỗi khi lấy tất cả cuộc thi: ", error);
-  }
-}
 
 export async function getContestById(contestId: number): Promise<IContest> {
   const failResult: IContest = {
@@ -122,7 +106,7 @@ export async function getRegisteredContests(userId: number, searchText: string):
     .rpc("get_registered_contest_list", { candidate_id: userId, search_text: searchText })
     .then((response) => response as PostgrestResponse<IContest>);
   if (error) {
-    throw new Error(error);
+    throw error;
   } else {
     // await new Promise(resolve => setTimeout(resolve, 5000))
     if (data && data.length !== 0) {

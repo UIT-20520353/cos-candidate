@@ -36,7 +36,7 @@ function RegisterContest() {
     const result = dataTeams?.find((item) => {
       return item.teamMembers.find((member) => member.account_id === user.id);
     });
-    setIsJoinTeam(result);
+    setIsJoinTeam(!!result);
   }, [dataTeams]);
 
   const openModal = () => {
@@ -137,7 +137,7 @@ function RegisterContest() {
           </>
         )}
       </div>
-      {isOpen && <AddTeamModal contestId={contest?.id} closeModal={closeModal} />}
+      {isOpen && <AddTeamModal contestId={contest?.id || -1} closeModal={closeModal} />}
     </div>
   );
 }

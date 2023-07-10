@@ -47,7 +47,7 @@ function SubmitPage() {
 
   const { mutate: mutateSubmit, isLoading } = useMutation({
     mutationFn: (body: IProblem) => {
-      return handleSubmit(body, language, code, user.id, problem?.id);
+      return handleSubmit(body, language, code, user.id, problem?.id || -1);
     },
     onSuccess: (response: boolean) => {
       if (response) {
@@ -74,7 +74,7 @@ function SubmitPage() {
       return;
     }
 
-    mutateSubmit(problem);
+    if (problem) mutateSubmit(problem);
   };
 
   return (

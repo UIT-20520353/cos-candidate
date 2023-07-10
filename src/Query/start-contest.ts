@@ -8,7 +8,7 @@ export async function fetchDataStartContest(userId: number, searchText: string):
     const result: IAllContest[] = [];
     for (const registeredContest of registeredContests) {
       const temp = contests.find((contest) => registeredContest.id === contest.id);
-      result.push(temp);
+      if (temp) result.push(temp);
     }
     return result;
   } catch (error) {
