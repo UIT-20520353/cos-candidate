@@ -1,22 +1,12 @@
 import AppRouter from "./config/AppRouter";
-import { useDispatch } from "react-redux";
-import { useEffect } from "react";
-import { userLogin } from "./pages/login/user.reducer";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (sessionStorage.getItem("id")) {
-      dispatch(
-        userLogin({ id: parseInt(sessionStorage.getItem("id") ?? "-1"), name: sessionStorage.getItem("name") ?? "" })
-      );
-    }
-  }, []);
-
   return (
-    <div>
+    <div className={"w-full"}>
       <AppRouter />
+      <ToastContainer pauseOnFocusLoss={false} pauseOnHover={false} closeOnClick={false} draggable={false} />
     </div>
   );
 }

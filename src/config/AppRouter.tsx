@@ -1,21 +1,22 @@
 import { Route, Routes } from "react-router-dom";
-import Dashboard from "../pages/dashboard";
-import Login from "../pages/login";
-import Contests from "../pages/contests";
-import ResetPassword from "../pages/ResetPassword";
-import StartContest from "../pages/StartContests";
-import CreateTeam from "../pages/CreateTeam";
-import RegisterContest from "../pages/RegisterContest";
-import Ranking from "../pages/Ranking";
-import Exercises from "../pages/exercises";
-import ProblemsOfContest from "../pages/ProblemsOfContest";
-import DetailProblem from "../pages/DetailProblem";
-import LayoutDetailProblem from "../layouts/LayoutDetailProblem";
-import ListSubmission from "../pages/ListSubmission";
-import Register from "../pages/register";
-import SubmitPage from "../pages/SubmitPage";
-import RankContest from "../pages/Ranking/RankContest";
-import ProfilePage from "../pages/ProfilePage";
+import Dashboard from "~/pages/dashboard";
+import ProfilePage from "~/pages/ProfilePage";
+import SubmitPage from "~/pages/SubmitPage";
+import Register from "~/pages/register";
+import Login from "~/pages/login";
+import Contests from "~/pages/contests";
+import RegisterContest from "~/pages/RegisterContest";
+import ProblemsOfContest from "~/pages/ProblemsOfContest";
+import RankContest from "~/pages/Ranking/RankContest";
+import ResetPassword from "~/pages/ResetPassword";
+import StartContest from "~/pages/StartContests";
+import CreateTeam from "~/pages/CreateTeam";
+import Ranking from "~/pages/Ranking";
+import Exercises from "~/pages/exercises";
+import LayoutDetailProblem from "~/layouts/LayoutDetailProblem";
+import DetailProblem from "~/pages/DetailProblem";
+import ListSubmission from "~/pages/ListSubmission";
+import { ProtectedRoute } from "~/components";
 
 function AppRouter() {
   return (
@@ -26,7 +27,14 @@ function AppRouter() {
       <Route path={"/register"} element={<Register />} />
       <Route path={"/contest"}>
         <Route index={true} path={"list"} element={<Contests />} />
-        <Route path={"list/register/:contestId"} element={<RegisterContest />} />
+        <Route
+          path={"register/:contestId"}
+          element={
+            <ProtectedRoute>
+              <RegisterContest />
+            </ProtectedRoute>
+          }
+        />
         <Route path={"enter/:id"} element={<ProblemsOfContest />} />
         <Route path={"ranking/:idContest"} element={<RankContest />} />
       </Route>
@@ -39,7 +47,7 @@ function AppRouter() {
       <Route path={"/problem"}>
         <Route path={"list"} element={<Exercises />} index={true} />
         <Route path={"detail/:idProblem"} element={<LayoutDetailProblem />}>
-          <Route path={":idContest"}>
+          <Route path={"contest/:idContest"}>
             <Route index={true} element={<DetailProblem />} />
             <Route path={"submit"} element={<SubmitPage />} />
             <Route path={"submission/mine"} element={<ListSubmission />} />

@@ -1,10 +1,10 @@
 import { SubmitHandler, useForm } from "react-hook-form";
-import { IAccount, IFormValue } from "../../types/account.type";
+import { IAccount, IFormValue } from "~/types/account.type";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { isEmailValid } from "../../utils/ValidateEmail/ValidateEmail";
+import { isEmailValid } from "~/utils/ValidateEmail/ValidateEmail";
 import Swal from "sweetalert2";
-import { getAccountList, insertAccount } from "../../Query/api/account-services";
+import { getAccountList, insertAccount } from "~/Query/api/account-services";
 
 const isPhoneNumberValid = (phoneNumber: string | null): boolean | string => {
   if (!phoneNumber) return true;

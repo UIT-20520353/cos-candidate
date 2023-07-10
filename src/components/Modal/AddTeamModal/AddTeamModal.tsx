@@ -1,11 +1,12 @@
-import ModalPortal from "../../ModalPortal";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { IFormTeamValue } from "../../../types/team.type";
+import { IFormTeamValue } from "~/types/team.type";
 import { useEffect } from "react";
 import Swal from "sweetalert2";
-import { handleCreateTeam } from "../../../Query/api/team-service";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../store";
+import ModalPortal from "~/components/ModalPortal";
+import { useSessionStorage } from "~/utils";
+import { createTeam } from "~/Query";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
 type ModalProps = {
   contestId: number;
@@ -19,16 +20,39 @@ function AddTeamModal(props: ModalProps) {
     formState: { errors },
     setValue
   } = useForm<IFormTeamValue>();
-  const user = useSelector((state: RootState) => state.user);
+  const [user] = useSessionStorage("cos-candidate", null);
 
   useEffect(() => {
     setValue("contestId", props.contestId);
-  }, []);
+  }, [props.contestId]);
+
+  const { mutate: mutateAddTeam } = useMutation({
+    mutationFn: (body: IFormTeamValue) => {
+      return createTeam(body, user.id);
+    },
+    onSuccess: (response: boolean) => {
+      if (response) {
+        toast("Tạo đội thành công", {
+          type: "success",
+          position: "bottom-right",
+          autoClose: 3000,
+          closeOnClick: false
+        });
+        props.closeModal();
+      } else {
+        toast("Xảy ra lỗi khi tạo đội", {
+          type: "error",
+          position: "bottom-right",
+          autoClose: 3000,
+          closeOnClick: false
+        });
+      }
+    }
+  });
 
   const onSubmit: SubmitHandler<IFormTeamValue> = (data) => {
     Swal.fire({
-      title: "Thông báo",
-      text: "Xác nhận tạo đội mới với các thông tin đã nhập?",
+      title: "Xác nhận tạo đội?",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
@@ -37,26 +61,7 @@ function AddTeamModal(props: ModalProps) {
       allowOutsideClick: false
     }).then((result) => {
       if (result.isConfirmed) {
-        handleCreateTeam(data, user.id).then((response) => {
-          if (response && response.length !== 0) {
-            Swal.fire({
-              position: "center",
-              title: "Tạo đội thành công",
-              showConfirmButton: true,
-              allowOutsideClick: false,
-              icon: "success"
-            });
-            props.closeModal();
-          } else {
-            Swal.fire({
-              position: "center",
-              title: "Tạo đội không thành công",
-              showConfirmButton: true,
-              allowOutsideClick: false,
-              icon: "error"
-            });
-          }
-        });
+        mutateAddTeam(data);
       }
     });
   };

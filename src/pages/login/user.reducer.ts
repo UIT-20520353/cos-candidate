@@ -1,4 +1,4 @@
-import { IUser } from "../../types/user.type";
+import { IUser } from "~/types/user.type";
 import { createAction, createReducer } from "@reduxjs/toolkit";
 
 const initialState: IUser = {

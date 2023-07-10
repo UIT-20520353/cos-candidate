@@ -15,7 +15,7 @@ export type IStatus = {
   registered: boolean;
 };
 
-export type IContest = {
+export interface IContest {
   id: number;
   name: string;
   description: string;
@@ -23,8 +23,24 @@ export type IContest = {
   time_begin: string;
   duration: string;
   host_id: number | null;
-};
+}
 
 export type IContestId = {
   contest_id: number;
 };
+
+export type IContestDashboard = {
+  id: number;
+  name: string;
+  date_begin: string;
+  time_begin: string;
+  host_name: string;
+};
+
+export type IContestForRanking = {
+  id: number;
+  name: string;
+  amount: number;
+};
+
+export type IAllContest = IContest & { amount: number };

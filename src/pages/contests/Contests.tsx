@@ -1,80 +1,57 @@
-import Header from "../../components/Header";
-import OverviewContest from "../../components/OverviewContest";
-import { IContest } from "../../types/contest.type";
+import Header from "~/components/Header";
+import OverviewContest from "~/components/OverviewContest";
 import { useEffect, useState } from "react";
-import { getContestList } from "../../Query/api/contest-service";
-import Swal from "sweetalert2";
-import { ITeam } from "../../types/team.type";
-import { getTeams } from "../../Query/api/team-service";
-import Search from "../../components/Search";
-
-const getAmount = (teams: ITeam[], contestId: number) => {
-  return teams.filter((team) => team.contest_id === contestId).length;
-};
+import { getAllContests } from "~/Query/api/contest-service";
+import Search from "~/components/Search";
+import ContestSkeleton from "~/skeletons/contest-skeleton";
+import { useQuery } from "@tanstack/react-query";
+import { fetchDataContests } from "~/Query";
 
 function Contests() {
-  const [contests, setContests] = useState<IContest[]>([]);
-  const [teams, setTeams] = useState<ITeam[]>([]);
-  const [filterContests, setFilterContests] = useState<IContest[]>([]);
-
-  const handleFetchData = async () => {
-    Swal.fire({
-      title: "Đang lấy dữ liệu",
-      allowOutsideClick: false,
-      showConfirmButton: false,
-      didOpen() {
-        Swal.showLoading();
-      }
-    });
-
-    const dataContests = await getContestList();
-    if (dataContests && dataContests.length !== 0) {
-      setContests(dataContests ?? []);
-      setFilterContests(dataContests ?? []);
-    }
-
-    const dataTeams = await getTeams();
-    if (dataTeams && dataTeams.length !== 0) {
-      setTeams(dataTeams ?? []);
-    }
-
-    Swal.close();
-  };
-
   useEffect(() => {
-    handleFetchData();
+    document.title = "Đăng ký thi";
   }, []);
+  const [searchText, setSearchText] = useState<string>("");
 
-  const handleSearch = (filtered: string) => {
-    if (!filtered) {
-      const temp = [...contests];
-      setFilterContests(temp);
-      return;
-    }
-
-    const temp = contests.filter((contest) => {
-      const nameContest = contest.name.toUpperCase();
-      return nameContest.includes(filtered.toUpperCase());
-    });
-    setFilterContests(temp);
+  const handleSearch = (value: string) => {
+    setSearchText(value);
   };
+
+  const { data: contests, isLoading } = useQuery({
+    queryKey: ["contest-list", "filter", searchText],
+    queryFn: () => {
+      return fetchDataContests(searchText);
+    }
+  });
 
   return (
     <div className={"flex w-full flex-col items-center"}>
       <Header />
       <div className={"my-8 w-4/5"}>
-        <p className={"text-2xl font-medium text-[#10002b]"}>Tất cả các cuộc thi</p>
-        <Search placeHolder={"Nhập tên cuộc thi"} handleSearch={handleSearch} />
-        <ul className={"mt-5 grid grid-cols-3 gap-4"}>
-          {filterContests.map((contest) => (
-            <OverviewContest
-              amount={getAmount(teams, contest.id)}
-              key={`contest-${contest.id}`}
-              contest={contest}
-              typeOverview={true}
-            />
-          ))}
-        </ul>
+        <div className={"flex w-full flex-row items-center justify-between"}>
+          <p className={"text-2xl font-medium text-[#10002b]"}>Tất cả các cuộc thi</p>
+          <Search placeHolder={"Nhập tên cuộc thi"} handleSearch={handleSearch} />
+        </div>
+        {isLoading && (
+          <ul className={"mt-5 grid grid-cols-3 gap-4"}>
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <ContestSkeleton key={`contest-skeleton-${item}`} />
+            ))}
+          </ul>
+        )}
+        {!isLoading && (
+          <div>
+            {contests?.length !== 0 ? (
+              <ul className={"mt-5 grid grid-cols-3 gap-4"}>
+                {contests?.map((contest) => (
+                  <OverviewContest key={`contest-${contest.id}`} contest={contest} typeOverview={true} />
+                ))}
+              </ul>
+            ) : (
+              <>{searchText !== "" ? <p>Không có kết quả cần tìm</p> : <p>Không có cuộc thi để đăng ký</p>}</>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,30 +1,27 @@
-import CodeEditor from "../../components/CodeEditor";
-import { ILanguageOption, languageOptions } from "../../constants/languageOptions";
-import { useState } from "react";
-import LanguagesDropdown from "../../components/LanguagesDropdown";
-import axios from "axios";
-import Swal from "sweetalert2";
-import { IResponseSubmission } from "../../types/submission.type";
-import { useParams } from "react-router-dom";
-import { getProblemsById } from "../../Query/api/problem-service";
-import { IProblem } from "../../types/problem.type";
-import { ITestcase } from "../../types/testcase.type";
-import { getTestcaseList } from "../../Query/api/testcase-service";
-import { insertSubmission } from "../../Query/api/submission-service";
+import CodeEditor from "~/components/CodeEditor";
+import { ILanguageOption, languageOptions } from "~/constants/languageOptions";
+import { useEffect, useState } from "react";
+import LanguagesDropdown from "~/components/LanguagesDropdown";
+import { IProblem } from "~/types";
+import { useNavigate, useParams } from "react-router-dom";
+import { getProblemsById, handleSubmit } from "~/Query";
+import { useSessionStorage } from "~/utils";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { LoadingModal } from "~/components";
+import { toast } from "react-toastify";
 
 const javascriptDefault = `// Nhập code ở đây`;
 
-const getIdNumber = (id: string | undefined): number => {
-  if (!id) return -1;
-
-  const temp = id.split("-");
-  return parseInt(temp[1]);
-};
-
 function SubmitPage() {
+  const navigate = useNavigate();
+  const [user] = useSessionStorage("cos-candidate", null);
   const { idProblem } = useParams<{ idProblem: string }>();
   const [language, setLanguage] = useState<ILanguageOption>(languageOptions[0]);
   const [code, setCode] = useState<string>(javascriptDefault);
+
+  useEffect(() => {
+    document.title = "Nộp bài";
+  }, []);
 
   const onSelectChange = (sl: ILanguageOption) => {
     setLanguage(sl);
@@ -41,120 +38,43 @@ function SubmitPage() {
     }
   };
 
-  const compileCode = async (input: string): Promise<IResponseSubmission> => {
-    const formData = {
-      language: language.value,
-      input: input,
-      code: code
-    };
-    const options = {
-      method: "POST",
-      url: "https://api.codex.jaagrav.in",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      data: formData
-    };
-
-    try {
-      return await axios.request<IResponseSubmission, any>(options);
-    } catch (err) {
-      console.log(err);
-      return err as IResponseSubmission;
+  const { data: problem, isLoading: isFetchingProblem } = useQuery({
+    queryKey: ["problem", Number(idProblem) || -1],
+    queryFn: () => {
+      return getProblemsById(Number(idProblem) || -1);
     }
-  };
+  });
 
-  const handleSubmit = async () => {
-    Swal.fire({
-      title: "Đang chấm điểm",
-      allowOutsideClick: false,
-      showConfirmButton: false,
-      position: "center",
-      didOpen() {
-        Swal.showLoading();
-      }
-    });
-
-    const problem: IProblem[] | undefined = await getProblemsById(getIdNumber(idProblem));
-    if (!problem) {
-      Swal.close();
-      return;
-    }
-
-    const response = await compileCode(problem[0].example_input);
-
-    if (response.data.error !== "") {
-      await insertSubmission(
-        "Compilation Error",
-        language.label,
-        code,
-        getIdNumber(idProblem),
-        parseInt(sessionStorage.getItem("id") ?? "-1")
-      );
-      Swal.close();
-      return;
-    }
-
-    if (response.data.output !== problem[0].example_output) {
-      await insertSubmission(
-        "Wrong Answer",
-        language.label,
-        code,
-        getIdNumber(idProblem),
-        parseInt(sessionStorage.getItem("id") ?? "-1")
-      );
-      Swal.close();
-      return;
-    }
-
-    const testcases: ITestcase[] | undefined = await getTestcaseList(getIdNumber(idProblem));
-    if (!testcases) {
-      await insertSubmission(
-        "Accepted",
-        language.label,
-        code,
-        getIdNumber(idProblem),
-        parseInt(sessionStorage.getItem("id") ?? "-1")
-      );
-      Swal.close();
-      return;
-    }
-
-    for (const testcase of testcases) {
-      const res = await compileCode(testcase.input);
-
-      if (res.data.error !== "") {
-        await insertSubmission(
-          "Compilation Error",
-          language.label,
-          code,
-          getIdNumber(idProblem),
-          parseInt(sessionStorage.getItem("id") ?? "-1")
-        );
-        Swal.close();
-        return;
-      }
-      if (res.data.output !== testcase.output) {
-        await insertSubmission(
-          "Wrong Answer",
-          language.label,
-          code,
-          getIdNumber(idProblem),
-          parseInt(sessionStorage.getItem("id") ?? "-1")
-        );
-        Swal.close();
-        return;
+  const { mutate: mutateSubmit, isLoading } = useMutation({
+    mutationFn: (body: IProblem) => {
+      return handleSubmit(body, language, code, user.id, problem?.id);
+    },
+    onSuccess: (response: boolean) => {
+      if (response) {
+        toast("Nộp bài thành công", {
+          type: "success",
+          position: "bottom-right",
+          autoClose: 3000,
+          closeOnClick: false
+        });
+      } else {
+        toast("Xảy ra lỗi khi nộp bài", {
+          type: "error",
+          position: "bottom-right",
+          autoClose: 3000,
+          closeOnClick: false
+        });
       }
     }
+  });
 
-    await insertSubmission(
-      "Accepted",
-      language.label,
-      code,
-      getIdNumber(idProblem),
-      parseInt(sessionStorage.getItem("id") ?? "-1")
-    );
-    Swal.close();
+  const submitClick = async () => {
+    if (!user) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    mutateSubmit(problem);
   };
 
   return (
@@ -168,15 +88,17 @@ function SubmitPage() {
         </div>
         <div className={"w-full"}>
           <button
-            onClick={handleSubmit}
+            onClick={submitClick}
             className={
               "mt-4 w-full rounded-md border-2 border-white bg-[#0077b6] py-2 text-white duration-300 hover:bg-[#023e8a] hover:text-white"
             }
+            disabled={isLoading || isFetchingProblem}
           >
             Nộp bài
           </button>
         </div>
       </div>
+      {isLoading && <LoadingModal title={"Đang chấm điểm"} />}
     </div>
   );
 }

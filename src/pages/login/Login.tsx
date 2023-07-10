@@ -1,49 +1,69 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
-import { useDispatch } from "react-redux";
-import { userLogin } from "./user.reducer";
-import { IFormLoginValue } from "../../types/account.type";
-import { handleLogin } from "../../Query/api/account-services";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { IFormLoginValue, ISimpleAccount } from "~/types";
+import { handleLogin } from "~/Query";
+import { useSessionStorage } from "~/utils";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+import { useEffect } from "react";
+import { LoadingModal } from "~/components";
+import CryptoJS from "crypto-js";
 
 function Login() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm<IFormLoginValue>();
+  const [, setUser] = useSessionStorage("cos-candidate", null);
+  const { register, handleSubmit } = useForm<IFormLoginValue>();
+
+  const { mutate: login, isLoading } = useMutation({
+    mutationFn: (body: IFormLoginValue) => {
+      const hashPassword = CryptoJS.SHA256(body.password).toString();
+      return handleLogin(body.username, hashPassword);
+    },
+    onSuccess: (data: ISimpleAccount) => {
+      if (data.id === -1) {
+        toast("Tên đăng nhập hoặc mật khẩu không chính xác", {
+          position: "bottom-right",
+          autoClose: 3000,
+          closeOnClick: false,
+          type: "error"
+        });
+        return;
+      }
+      setUser({ id: data.id, name: data.name });
+      navigate("/");
+      toast("Đăng nhập thành công", {
+        position: "bottom-right",
+        autoClose: 3000,
+        closeOnClick: false,
+        type: "success"
+      });
+    }
+  });
+
+  useEffect(() => {
+    document.title = "Đăng nhập";
+  }, []);
 
   const onSubmit: SubmitHandler<IFormLoginValue> = (data) => {
-    handleLogin(data).then((response) => {
-      if (response && response.length !== 0) {
-        console.log(response);
-        sessionStorage.setItem("id", response[0].id.toString());
-        sessionStorage.setItem("name", response[0].name);
-        dispatch(userLogin({ id: response[0].id, name: response[0].name }));
-        navigate("/");
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Đăng nhập thành công",
-          showConfirmButton: true,
-          confirmButtonText: "Đồng ý",
-          timer: 3000,
-          allowOutsideClick: false
-        });
-      } else {
-        Swal.fire({
-          position: "center",
-          icon: "error",
-          title: "Đăng nhập không thành công",
-          text: "Tên đăng nhập hoặc mật khẩu không chính xác",
-          showConfirmButton: true,
-          timer: 3000,
-          allowOutsideClick: false
-        });
-      }
-    });
+    if (!data.username) {
+      toast("Vui lòng nhập tên đăng nhập", {
+        position: "bottom-right",
+        autoClose: 3000,
+        closeOnClick: false,
+        type: "warning"
+      });
+      return;
+    }
+    if (!data.password) {
+      toast("Vui lòng nhập mật khẩu", {
+        position: "bottom-right",
+        autoClose: 3000,
+        closeOnClick: false,
+        type: "warning"
+      });
+      return;
+    }
+    login(data);
   };
 
   return (
@@ -62,9 +82,8 @@ function Login() {
               "block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
             }
             autoComplete={"off"}
-            {...register("username", { required: "Vui lòng nhập tên đăng nhập" })}
+            {...register("username")}
           />
-          {errors.username && <span className={"absolute text-xs text-red-600"}>{errors.username.message}</span>}
         </div>
         <div className={"relative w-full"}>
           <span className={"mb-2 block text-base font-medium font-medium text-gray-900"}>Mật khẩu</span>
@@ -75,11 +94,10 @@ function Login() {
               "block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
             }
             autoComplete={"off"}
-            {...register("password", { required: "Vui lòng nhập mật khẩu" })}
+            {...register("password")}
           />
-          {errors.password && <span className={"absolute text-xs text-red-600"}>{errors.password.message}</span>}
         </div>
-        <div className={"mt-4 flex w-full flex-col items-start gap-y-3"}>
+        <div className={"flex w-full flex-col items-start gap-y-3"}>
           <button className={"w-full rounded-lg bg-[#0077b6] py-2 text-white duration-300 hover:bg-[#023e8a]"}>
             Đăng nhập
           </button>
@@ -96,6 +114,7 @@ function Login() {
           </div>
         </div>
       </form>
+      {isLoading && <LoadingModal title={"Đang xử lý đăng nhập"} />}
     </div>
   );
 }

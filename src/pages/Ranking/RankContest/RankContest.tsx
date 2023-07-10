@@ -1,149 +1,119 @@
-import Header from "../../../components/Header";
-import { useEffect, useState } from "react";
-import Swal from "sweetalert2";
-import { useParams } from "react-router-dom";
-import { getContestById } from "../../../Query/api/contest-service";
-import { IContest } from "../../../types/contest.type";
-import { getTeamList, getTeamMember } from "../../../Query/api/team-service";
-import { getProblemsByContestId } from "../../../Query/api/problem-service";
-import { getAllSubmission } from "../../../Query/api/submission-service";
-
-type IRanking = {
-  id: number;
-  name: string;
-  solved: number;
-};
-
-const initialContest: IContest = {
-  id: -1,
-  name: "",
-  description: "",
-  date_begin: "",
-  time_begin: "",
-  duration: "",
-  host_id: -1
-};
+import Header from "~/components/Header";
+import { useEffect } from "react";
+import { NavLink, useParams } from "react-router-dom";
+import { getContestById } from "~/Query/api/contest-service";
+import { useQuery } from "@tanstack/react-query";
+import { fetchDataRankContest } from "~/Query";
+import RankContestSkeleton from "~/skeletons/rank-contest-skeleton";
 
 function RankContest() {
   const { idContest } = useParams<{ idContest: string }>();
-  const [contest, setContest] = useState<IContest>(initialContest);
-  const [teams, setTeams] = useState<IRanking[]>([]);
-  const [numberProblem, setNumberProblem] = useState<number>(0);
 
-  const handleFetchData = async () => {
-    Swal.fire({
-      title: "Đang lấy dữ liệu",
-      allowOutsideClick: false,
-      showConfirmButton: false,
-      didOpen() {
-        Swal.showLoading();
-      }
-    });
-
-    const contestsResponse = await getContestById(parseInt(idContest ?? "-1"));
-    const teamsResponse = await getTeamList(parseInt(idContest ?? "-1"));
-    const problemsResponse = await getProblemsByContestId(parseInt(idContest ?? "-1"));
-    const submissionsResponse = await getAllSubmission();
-    if (
-      !teamsResponse ||
-      teamsResponse.length === 0 ||
-      !problemsResponse ||
-      problemsResponse.length === 0 ||
-      !contestsResponse ||
-      contestsResponse.length === 0 ||
-      !submissionsResponse ||
-      submissionsResponse.length === 0
-    ) {
-      Swal.close();
-      return;
+  const { data: contest, isLoading: isFetchingContest } = useQuery({
+    queryKey: ["contest", Number(idContest) || -1],
+    queryFn: () => {
+      return getContestById(Number(idContest) || -1);
     }
-    const teamIds = teamsResponse.map((team) => team.id);
-    const teamMembersResponse = await getTeamMember(teamIds);
-    if (!teamMembersResponse) {
-      Swal.close();
-      return;
-    }
+  });
 
-    const ranking: IRanking[] = [];
-    setContest(contestsResponse[0] ?? initialContest);
-    for (const team of teamsResponse) {
-      ranking.push({ id: team.id, name: team.name, solved: 0 });
+  const { data, isLoading: isFetchingData } = useQuery({
+    queryKey: ["rank-contest", Number(idContest) || -1],
+    queryFn: () => {
+      return fetchDataRankContest(Number(idContest) || -1);
     }
-    setNumberProblem(problemsResponse.length ?? 0);
-    for (const problem of problemsResponse) {
-      for (const team of teamsResponse) {
-        const members = teamMembersResponse.filter((member) => member.team_id === team.id);
-        for (const member of members) {
-          const result = submissionsResponse?.find(
-            (submission) =>
-              submission.account_id === member.account_id &&
-              submission.status === "Accepted" &&
-              submission.problem_id === problem.id
-          );
+  });
 
-          if (result) {
-            ranking.forEach((rank) => {
-              if (rank.id === team.id) rank.solved += 1;
-            });
-            break;
-          }
-        }
-      }
-    }
-
-    const sortedRanking = ranking.sort((a, b) => b.solved - a.solved);
-    setTeams(sortedRanking);
-    Swal.close();
-  };
+  console.log(data);
 
   useEffect(() => {
-    handleFetchData();
+    document.title = "Kết quả cuộc thi";
   }, []);
 
   return (
     <div className={"flex w-full flex-col items-center"}>
       <Header />
-      <div className={"my-8 w-4/5"}>
-        <p className={"text-2xl font-medium text-[#10002b]"}>Bảng xếp hạng của cuộc thi {contest.name}</p>
-        {teams && teams.length !== 0 && (
-          <table className="mt-5 w-full text-center text-sm text-gray-500">
-            <thead className="bg-gray-50 text-xs uppercase text-gray-700">
-              <tr>
-                <th scope="col" className="w-1/5 px-6 py-3">
-                  Thứ hạng
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Tên đội
-                </th>
-                <th scope="col" className="w-1/5 px-6 py-3">
-                  Số bài giải được
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {teams.map((team, index) => {
-                const isOdd = !(index % 2);
-
-                return (
-                  <tr key={`team-${team.id}`} className={`border-b ${isOdd ? "bg-white" : "bg-gray-50"}`}>
-                    <th
-                      scope="row"
-                      className={`whitespace-nowrap px-6 py-4 font-medium ${isOdd ? "text-black" : "text-gray-900"}`}
-                    >
-                      {index + 1}
-                    </th>
-                    <td className="px-6 py-4 text-base font-medium text-black">{team.name}</td>
-                    <td className="px-6 py-4 text-base font-medium text-black">
-                      {team.solved}/{numberProblem}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-        {(!teams || teams.length === 0) && <p className={"text-base"}>Không có đội tham gia cuộc thi</p>}
-      </div>
+      {(isFetchingContest || isFetchingData) && <RankContestSkeleton />}
+      {!isFetchingContest && !isFetchingData && (
+        <div className={"my-8 w-4/5"}>
+          <div className={"flex flex-row items-center justify-between"}>
+            <p className={"text-lg font-medium"}>Bảng xếp hạng của cuộc thi {contest?.name}</p>
+            {/*<NavLink*/}
+            {/*  className={*/}
+            {/*    "inline-block rounded-md bg-gray-300 px-6 py-2 text-base font-medium shadow-md duration-300 hover:bg-gray-200"*/}
+            {/*  }*/}
+            {/*  to={"/contest/list/registered"}*/}
+            {/*>*/}
+            {/*  Quay lại*/}
+            {/*</NavLink>*/}
+          </div>
+          <div className={"mt-5 max-h-[550px] w-[1250px] overflow-y-scroll"}>
+            <table className="table-auto border-separate border-spacing-1 text-center text-sm text-gray-500">
+              <thead className="bg-gray-200 text-xs uppercase text-gray-700">
+                <tr>
+                  <th scope="col" className="min-w-[80px] rounded border border-slate-600 px-6 py-3">
+                    Hạng
+                  </th>
+                  <th scope="col" className="w-full min-w-[384px] rounded border border-slate-600 px-6 py-3">
+                    Tên đội
+                  </th>
+                  {data?.problems.map((problem) => {
+                    return (
+                      <th
+                        key={`header-problem-${problem.id}`}
+                        scope="col"
+                        className="min-w-[224px] rounded border border-slate-600 px-6 py-3"
+                      >
+                        {problem.name}
+                      </th>
+                    );
+                  })}
+                  <th scope="col" className="min-w-[128px] rounded border border-slate-600 px-6 py-3">
+                    Tổng số giải được
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {data?.teams.map((team, index) => {
+                  let count = 0;
+                  return (
+                    <tr key={`rank-row-${index}`} className={`border-b bg-white`}>
+                      <th
+                        scope="row"
+                        className={`whitespace-nowrap rounded border border-black px-3 py-1 font-medium text-black`}
+                      >
+                        {index + 1}
+                      </th>
+                      <td className="rounded border border-black px-3 py-1 text-base font-medium text-black">
+                        {team.team_name}
+                      </td>
+                      {data?.problems.map((problem, index2) => {
+                        const status = data?.result[`${team.team_id}-${problem.id}`];
+                        if (status === "Accepted") count++;
+                        return (
+                          <td key={`row-${index}-${index2}`} className="text-base font-bold text-black">
+                            <div
+                              className={`flex h-10 w-full items-center justify-center rounded-md ${
+                                status === "Accepted" && "bg-green-600"
+                              } ${status === "Wrong answer" && "bg-yellow-300"} ${
+                                status === "Not submit" && "bg-gray-200"
+                              }`}
+                            >
+                              <p>{status}</p>
+                            </div>
+                          </td>
+                        );
+                      })}
+                      <td className="rounded border border-black px-3 py-1 text-base font-medium text-black">
+                        {count}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

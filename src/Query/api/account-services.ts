@@ -1,8 +1,7 @@
 import supabase from "./supabase";
-import { IAccount, IFormLoginValue, IFormValue } from "../../types/account.type";
+import { IAccount, IFormValue, ISimpleAccount } from "~/types/account.type";
 import { PostgrestResponse } from "@supabase/supabase-js";
 import CryptoJS from "crypto-js";
-import Swal from "sweetalert2";
 
 export async function insertAccount(account: IFormValue) {
   try {
@@ -47,32 +46,30 @@ export async function getAccountList() {
   }
 }
 
-export async function handleLogin(account: IFormLoginValue) {
+export async function handleLogin(username: string, password: string): Promise<ISimpleAccount> {
+  const failResult: ISimpleAccount = {
+    id: -1,
+    name: ""
+  };
+
   try {
-    Swal.fire({
-      title: "Đang xử lý đăng nhập",
-      allowOutsideClick: false,
-      showConfirmButton: false,
-      didOpen() {
-        Swal.showLoading();
-      }
-    });
-    const hashPassword = CryptoJS.SHA256(account.password).toString();
-    const { data, error }: PostgrestResponse<IAccount> = await supabase
-      .from("accounts")
-      .select("*")
-      .eq("username", account.username)
-      .eq("password", hashPassword)
-      .then((response) => response as PostgrestResponse<IAccount>);
-    Swal.close();
+    const { data, error }: PostgrestResponse<ISimpleAccount> = await supabase
+      .rpc("handle_login", {
+        password_login: password,
+        role_login: 3,
+        username_login: username
+      })
+      .then((response) => response as PostgrestResponse<ISimpleAccount>);
     if (error) {
-      throw error;
+      console.error("handleLogin :", error);
+      return failResult;
     } else {
-      return data;
+      if (data && data.length !== 0) return data[0];
+      else return failResult;
     }
   } catch (error) {
-    console.error("Lỗi khi thực hiện đăng nhập: ", error);
-    Swal.close();
+    console.error("handleLogin :", error);
+    return failResult;
   }
 }
 
@@ -98,7 +95,20 @@ export async function updateAccount(id: number, name: string, email: string, pho
   }
 }
 
-export async function getAccountInfo(id: number) {
+export async function getAccountInfo(id: number): Promise<IAccount> {
+  const failResult: IAccount = {
+    id: -1,
+    name: "",
+    username: "",
+    password: "",
+    email: null,
+    phone: null,
+    birth_day: null,
+    address: null,
+    role_id: -1,
+    host_id: -1
+  };
+
   try {
     const { data, error }: PostgrestResponse<IAccount> = await supabase
       .from("accounts")
@@ -106,16 +116,18 @@ export async function getAccountInfo(id: number) {
       .eq("id", id)
       .then((res) => res as PostgrestResponse<IAccount>);
     if (error) {
-      console.error("getAccountInfo: ", error);
+      throw error;
     } else {
-      return data;
+      if (data && data.length !== 0) return data[0];
+      return failResult;
     }
   } catch (error) {
     console.error("getAccountInfo: ", error);
+    return failResult;
   }
 }
 
-export async function changePassword(id: number, password: string) {
+export async function changePassword(id: number, password: string): Promise<boolean> {
   try {
     const { data, error } = await supabase
       .from("accounts")
@@ -125,11 +137,29 @@ export async function changePassword(id: number, password: string) {
       .eq("id", id)
       .select("*");
     if (error) {
-      console.error("changePassword: ", error);
+      throw error;
+    } else {
+      return !!data;
+    }
+  } catch (error) {
+    console.error("changePassword: ", error);
+    return false;
+  }
+}
+
+export async function checkEmail(email: string): Promise<IAccount[] | undefined> {
+  try {
+    const { data, error }: PostgrestResponse<IAccount> = await supabase
+      .from("accounts")
+      .select("*")
+      .eq("email", email)
+      .then((res) => res as PostgrestResponse<IAccount>);
+    if (error) {
+      console.error("checkEmail: ", error);
     } else {
       return data;
     }
   } catch (error) {
-    console.error("changePassword: ", error);
+    console.error("checkEmail: ", error);
   }
 }

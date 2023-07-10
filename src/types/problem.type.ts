@@ -6,3 +6,9 @@ export type IProblem = {
   example_output: string;
   contest_id: number;
 };
+
+export type IOverviewProblem = {
+  id: number;
+  name: string;
+  amount: number;
+};

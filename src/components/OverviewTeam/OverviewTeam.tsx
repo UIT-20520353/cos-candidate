@@ -1,43 +1,110 @@
 import { FaUserAlt } from "react-icons/all";
-import { ITeamMemberDetail } from "../../types/team.type";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
+import { ITeamMember } from "~/types";
+import { useSessionStorage } from "~/utils";
 import Swal from "sweetalert2";
-import { handleDeleteTeam, handleJoinTeamAPI, handleLeaveTeamAPI } from "../../Query/api/team-service";
+import { useMutation } from "@tanstack/react-query";
+import { deleteTeam, joinTeam, leaveTeam } from "~/Query";
+import { toast } from "react-toastify";
 
 type IProps = {
   teamId: number;
   name: string;
-  teamMemberDetails: ITeamMemberDetail[];
-  updateList: () => void;
+  teamMembers: ITeamMember[];
   max_member: number;
+  isJoinTeam: boolean;
+  updateList: () => void;
 };
 
 function OverviewTeam(props: IProps) {
-  const user = useSelector((state: RootState) => state.user);
+  const [user] = useSessionStorage("cos-candidate", null);
   const [myTeam, setMyTeam] = useState<boolean>(false);
-  const [numberOfMember, setNumberOfMember] = useState<number>(0);
 
   useEffect(() => {
-    const result = props.teamMemberDetails.find(
-      (teamMemberDetail) => user.id === teamMemberDetail.account_id && teamMemberDetail.team_id === props.teamId
-    );
-    if (result) setMyTeam(true);
-    else setMyTeam(false);
+    setMyTeam(false);
+    props.teamMembers.forEach((member) => {
+      if (member.account_id === user.id) {
+        setMyTeam(true);
+      }
+    });
+  }, [props.teamMembers]);
 
-    const count = props.teamMemberDetails.filter((member) => member.team_id === props.teamId).length;
-    setNumberOfMember(count);
+  const { mutate: mutateJoin } = useMutation({
+    mutationFn: (body: { teamId: number; accountId: number }) => {
+      return joinTeam(body.teamId, body.accountId);
+    },
+    onSuccess: (response: boolean) => {
+      if (response) {
+        toast("Tham gia đội thành công", {
+          type: "success",
+          position: "bottom-right",
+          autoClose: 3000,
+          closeOnClick: false
+        });
+        props.updateList();
+      } else {
+        toast("Xảy ra lỗi khi tham gia đội", {
+          type: "error",
+          position: "bottom-right",
+          autoClose: 3000,
+          closeOnClick: false
+        });
+      }
+    }
   });
-  const handleJoinTeam = () => {
-    const result = props.teamMemberDetails.find((dataTeamMember) => dataTeamMember.account_id === user.id);
+  const { mutate: mutateDelete } = useMutation({
+    mutationFn: (body: number) => {
+      return deleteTeam(body);
+    },
+    onSuccess: (response: boolean) => {
+      if (response) {
+        toast("Xóa đội thành công", {
+          type: "success",
+          position: "bottom-right",
+          autoClose: 3000,
+          closeOnClick: false
+        });
+        props.updateList();
+      } else {
+        toast("Xảy ra lỗi khi xóa gia đội", {
+          type: "error",
+          position: "bottom-right",
+          autoClose: 3000,
+          closeOnClick: false
+        });
+      }
+    }
+  });
+  const { mutate: mutateLeave } = useMutation({
+    mutationFn: (body: number) => {
+      return leaveTeam(body);
+    },
+    onSuccess: (response: boolean) => {
+      if (response) {
+        toast("Rời đội thành công", {
+          type: "success",
+          position: "bottom-right",
+          autoClose: 3000,
+          closeOnClick: false
+        });
+        props.updateList();
+      } else {
+        toast("Xảy ra lỗi khi rời gia đội", {
+          type: "error",
+          position: "bottom-right",
+          autoClose: 3000,
+          closeOnClick: false
+        });
+      }
+    }
+  });
 
-    if (result) {
+  const handleJoinTeam = () => {
+    if (props.isJoinTeam) {
       Swal.fire({
         position: "center",
         icon: "warning",
-        title: "Thông báo",
-        text: "Bạn đã tham gia đội, vui lòng rời đội trước khi tham gia đội mới",
+        title: "Bạn đã tham gia đội, vui lòng rời đội trước khi tham gia đội mới",
         showConfirmButton: true,
         confirmButtonText: "Đồng ý",
         allowOutsideClick: false
@@ -55,40 +122,18 @@ function OverviewTeam(props: IProps) {
       allowOutsideClick: false
     }).then((result) => {
       if (result.isConfirmed) {
-        handleJoinTeamAPI(props.teamId, user.id).then((response) => {
-          if (response) {
-            props.updateList();
-            Swal.fire({
-              position: "center",
-              icon: "success",
-              title: "Tham gia đội thành công",
-              showConfirmButton: true,
-              confirmButtonText: "Đồng ý",
-              allowOutsideClick: false
-            });
-          } else {
-            Swal.fire({
-              position: "center",
-              icon: "error",
-              title: "Thông báo",
-              text: "Xảy ra lỗi khi tham gia đội",
-              showConfirmButton: true,
-              confirmButtonText: "Đồng ý",
-              allowOutsideClick: false
-            });
-          }
-        });
+        const body = { teamId: props.teamId, accountId: user.id };
+        mutateJoin(body);
       }
     });
   };
   const handleLeaveTeam = () => {
-    const temp = props.teamMemberDetails.find((member) => member.account_id === user.id);
-    if (!temp) return;
+    const detailMember = props.teamMembers.find((member) => member.account_id === user.id);
+    if (!detailMember) return;
 
-    if (temp.is_leader) {
+    if (detailMember.is_leader) {
       Swal.fire({
-        title: "Thông báo",
-        text: "Bạn đang là đội trưởng, xác nhận rời đội sẽ xóa đội này?",
+        title: "Bạn đang là đội trưởng, xác nhận rời đội sẽ xóa đội này?",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
@@ -97,30 +142,7 @@ function OverviewTeam(props: IProps) {
         allowOutsideClick: false
       }).then((result) => {
         if (result.isConfirmed) {
-          handleDeleteTeam(props.teamId).then((response) => {
-            if (response) {
-              props.updateList();
-              Swal.fire({
-                position: "center",
-                icon: "success",
-                title: "Rời đội thành công",
-                showConfirmButton: true,
-                confirmButtonText: "Đồng ý",
-                allowOutsideClick: false,
-                timer: 3000
-              });
-            } else {
-              Swal.fire({
-                position: "center",
-                icon: "error",
-                title: "Thông báo",
-                text: "Xảy ra lỗi khi rời đội",
-                showConfirmButton: true,
-                confirmButtonText: "Đồng ý",
-                allowOutsideClick: false
-              });
-            }
-          });
+          mutateDelete(props.teamId);
         }
       });
       return;
@@ -137,32 +159,7 @@ function OverviewTeam(props: IProps) {
       allowOutsideClick: false
     }).then((result) => {
       if (result.isConfirmed) {
-        const temp = props.teamMemberDetails.find((member) => member.account_id === user.id);
-        if (temp)
-          handleLeaveTeamAPI(temp.id).then((response) => {
-            if (response) {
-              props.updateList();
-              Swal.fire({
-                position: "center",
-                icon: "success",
-                title: "Rời đội thành công",
-                showConfirmButton: true,
-                confirmButtonText: "Đồng ý",
-                allowOutsideClick: false,
-                timer: 3000
-              });
-            } else {
-              Swal.fire({
-                position: "center",
-                icon: "error",
-                title: "Thông báo",
-                text: "Xảy ra lỗi khi rời đội",
-                showConfirmButton: true,
-                confirmButtonText: "Đồng ý",
-                allowOutsideClick: false
-              });
-            }
-          });
+        mutateLeave(detailMember.id);
       }
     });
   };
@@ -178,21 +175,21 @@ function OverviewTeam(props: IProps) {
         <p className={"mb-3 truncate text-lg font-semibold"}>{props.name}</p>
 
         <ul>
-          {props.teamMemberDetails.map((member) => {
-            if (member.team_id === props.teamId)
-              return (
-                <li
-                  id={`member-${member.accounts.id}`}
-                  key={`member-${member.accounts.id}`}
-                  className={"group mt-4 flex cursor-pointer flex-row items-center gap-x-2"}
-                >
-                  <FaUserAlt className={"inline-block h-5 w-5 opacity-50 group-hover:opacity-100"} />
-                  <span className={"text-sm text-gray-500 group-hover:text-black group-hover:underline"}>
-                    {member.accounts.name}{" "}
-                    {member.is_leader && <span className={"text-sm font-medium"}>(Nhóm trưởng)</span>}
-                  </span>
-                </li>
-              );
+          {props.teamMembers.map((member) => {
+            // if (member.team_id === props.teamId)
+            return (
+              <li
+                id={`member-${member.account_id}`}
+                key={`member-${member.account_id}`}
+                className={"group mt-4 flex flex-row items-center gap-x-2"}
+              >
+                <FaUserAlt className={"inline-block h-5 w-5 opacity-50"} />
+                <span className={"text-sm text-gray-500"}>
+                  {member.member_name}{" "}
+                  {member.is_leader && <span className={"text-sm font-medium"}>(Nhóm trưởng)</span>}
+                </span>
+              </li>
+            );
           })}
         </ul>
       </div>
@@ -208,7 +205,7 @@ function OverviewTeam(props: IProps) {
             Rời nhóm
           </button>
         )}
-        {!myTeam && numberOfMember < props.max_member && (
+        {!myTeam && props.teamMembers.length < props.max_member && (
           <button
             className={
               "rounded-md bg-[#78c6a3] px-4 py-2 text-sm font-medium duration-300 hover:bg-[#469d89] hover:text-white"

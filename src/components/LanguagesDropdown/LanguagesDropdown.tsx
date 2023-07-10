@@ -1,6 +1,6 @@
 import Select from "react-select";
-import { ILanguageOption, languageOptions } from "../../constants/languageOptions";
-import { customStyles } from "../../constants/customStyles";
+import { ILanguageOption, languageOptions } from "~/constants/languageOptions";
+import { customStyles } from "~/constants/customStyles";
 
 type IProps = {
   onSelectChange: (sl: ILanguageOption) => void;

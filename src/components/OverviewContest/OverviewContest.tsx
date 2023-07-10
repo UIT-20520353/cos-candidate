@@ -1,51 +1,23 @@
 import { BiTimeFive, GiDuration, MdDateRange, RiTeamFill } from "react-icons/all";
 import { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { IContest } from "../../types/contest.type";
-import { getDateAndTime, getTimeEnd } from "../../utils/ValidateDate/ValidateDate";
-import { RootState } from "../../store";
+import { NavLink } from "react-router-dom";
+import { IAllContest } from "~/types";
+import { getContestStatus } from "~/utils";
 
 type IProps = {
-  contest: IContest;
-  amount: number;
+  contest: IAllContest;
   typeOverview: boolean;
 };
 
 function OverviewContest(props: IProps) {
-  const user = useSelector((state: RootState) => state.user);
-
-  const navigate = useNavigate();
   const [status, setStatus] = useState<string>("");
   const [dateDisplay, setDateDisplay] = useState<string>("");
 
   useEffect(() => {
-    const current_date = new Date();
-    const { year, month, day, hour, minute, second } = getDateAndTime(
-      props.contest.date_begin,
-      props.contest.time_begin
-    );
-
-    const time_begin = new Date(year, month, day, hour, minute, second);
-    const time_end = getTimeEnd({ year, month, day, hour, minute, second, duration: props.contest.duration });
-
-    if (time_begin > current_date) setStatus("Chưa bắt đầu");
-    else {
-      if (time_begin <= current_date && time_end >= current_date) setStatus("Đang diễn ra");
-      else {
-        setStatus("Đã kết thúc");
-      }
-    }
-    setDateDisplay(`${day}/${month + 1}/${year}`);
+    const data = getContestStatus(props.contest.date_begin, props.contest.time_begin, props.contest.duration);
+    setStatus(data.status);
+    setDateDisplay(data.dateDisplay);
   }, []);
-
-  const handleRegisterContestClick = () => {
-    if (user.id !== -1) {
-      navigate(`/contest/list/register/contest-${props.contest.id}`, { replace: true });
-    } else {
-      navigate("/login", { replace: true });
-    }
-  };
 
   return (
     <li
@@ -65,7 +37,7 @@ function OverviewContest(props: IProps) {
       </span>
       <div className={"mt-4 flex flex-row items-center gap-x-2"}>
         <RiTeamFill className={"inline-block h-5 w-5 opacity-50"} />
-        <span className={"text-sm text-gray-500"}>{props.amount} đội tham gia</span>
+        <span className={"text-sm text-gray-500"}>{props.contest.amount} đội tham gia</span>
       </div>
       <div className={"mt-4 flex flex-row items-center gap-x-2"}>
         <MdDateRange className={"inline-block h-5 w-5 opacity-50"} />
@@ -83,14 +55,14 @@ function OverviewContest(props: IProps) {
         {props.typeOverview ? (
           <div>
             {status !== "Đã kết thúc" && (
-              <button
+              <NavLink
                 className={
-                  "mr-3 w-44 rounded-md bg-[#0077b6] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
+                  "mr-3 inline-block w-44 rounded-md bg-[#0077b6] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
                 }
-                onClick={handleRegisterContestClick}
+                to={`/contest/register/${props.contest.id}`}
               >
                 Đăng ký tham gia
-              </button>
+              </NavLink>
             )}
             {(status === "Đã kết thúc" || status === "Đang diễn ra") && (
               <NavLink
@@ -110,7 +82,7 @@ function OverviewContest(props: IProps) {
                 className={
                   "mr-3 inline-block w-44 rounded-md bg-[#0077b6] px-4 py-2 text-center text-base font-medium text-white duration-300 hover:opacity-70"
                 }
-                to={`/contest/enter/contest-${props.contest.id}`}
+                to={`/contest/enter/${props.contest.id}`}
               >
                 Vào thi
               </NavLink>

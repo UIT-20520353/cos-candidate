@@ -1,10 +1,13 @@
-import ModalPortal from "../../ModalPortal";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { IAccount, IFormChangePassword } from "../../../types/account.type";
+import { IAccount, IFormChangePassword } from "~/types/account.type";
 import { useEffect, useState } from "react";
-import { changePassword, getAccountInfo } from "../../../Query/api/account-services";
+import { changePassword, getAccountInfo } from "~/Query/api/account-services";
 import Swal from "sweetalert2";
 import CryptoJS from "crypto-js";
+import ModalPortal from "~/components/ModalPortal";
+import { useSessionStorage } from "~/utils";
+import { toast } from "react-toastify";
+import { useQuery } from "@tanstack/react-query";
 
 type ModalProps = {
   closeModal: () => void;
@@ -17,31 +20,29 @@ function ChangePasswordModal(props: ModalProps) {
     formState: { errors },
     getValues
   } = useForm<IFormChangePassword>();
-  const [accounts, setAccounts] = useState<IAccount[]>([]);
+  const [user] = useSessionStorage("cos-candidate", null);
 
-  useEffect(() => {
-    getAccountInfo(parseInt(sessionStorage.getItem("id") ?? "-1")).then((response) => {
-      if (response && response.length !== 0) setAccounts(response ?? []);
-    });
-  }, []);
+  const { data: account } = useQuery({
+    queryKey: ["profile", `user-${user.id}`],
+    queryFn: () => {
+      return getAccountInfo(user.id);
+    }
+  });
 
   const onSubmit: SubmitHandler<IFormChangePassword> = (data) => {
     const hashOldPassword = CryptoJS.SHA256(data.oldPassword).toString();
-    if (hashOldPassword !== accounts[0].password) {
-      Swal.fire({
-        title: "Thông báo",
-        text: "Mật khẩu cũ không đúng",
-        icon: "error",
-        showConfirmButton: true,
-        confirmButtonText: "Đồng ý",
-        allowOutsideClick: false
+    if (hashOldPassword !== account?.password) {
+      toast("Mật khẩu cũ không đúng", {
+        type: "error",
+        position: "bottom-right",
+        autoClose: 3000,
+        closeOnClick: false
       });
       return;
     }
 
     Swal.fire({
-      title: "Thông báo",
-      text: "Xác nhận đổi mật khẩu?",
+      title: "Xác nhận đổi mật khẩu?",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
@@ -51,29 +52,21 @@ function ChangePasswordModal(props: ModalProps) {
     }).then((result) => {
       if (result.isConfirmed) {
         const hashNewPassword = CryptoJS.SHA256(data.newPassword).toString();
-        changePassword(parseInt(sessionStorage.getItem("id") ?? "-1"), hashNewPassword).then((response) => {
-          if (response && response.length !== 0) {
-            Swal.fire({
-              position: "center",
-              icon: "success",
-              title: "Thông báo",
-              text: "Đổi mật khẩu hành công",
-              allowOutsideClick: false,
-              showConfirmButton: true,
-              confirmButtonText: "Đồng ý",
-              timer: 4000
+        changePassword(user.id, hashNewPassword).then((response) => {
+          if (response) {
+            toast("Đổi mật khẩu thành công", {
+              type: "success",
+              position: "bottom-right",
+              autoClose: 3000,
+              closeOnClick: false
             });
             props.closeModal();
           } else {
-            Swal.fire({
-              position: "center",
-              icon: "error",
-              title: "Thông báo",
-              text: "Xảy ra lỗi khi đổi mật khẩu",
-              allowOutsideClick: false,
-              showConfirmButton: true,
-              confirmButtonText: "Đồng ý",
-              timer: 4000
+            toast("Xảy ra lỗi khi đổi mật khẩu", {
+              type: "error",
+              position: "bottom-right",
+              autoClose: 3000,
+              closeOnClick: false
             });
           }
         });

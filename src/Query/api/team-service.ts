@@ -1,189 +1,156 @@
-import { IFormTeamValue, ITeam, ITeamId, ITeamMember, ITeamMemberDetail } from "../../types/team.type";
+import { IFormTeamValue, ITeam, ITeamId, ITeamMember, IContestId, ITeamRank } from "~/types";
 import supabase from "./supabase";
 import { PostgrestResponse } from "@supabase/supabase-js";
-import { IContestId } from "../../types/contest.type";
+import { IDataRankContest } from "~/Query";
 
-export async function insertTeam(team: IFormTeamValue) {
+export async function insertTeam(team: IFormTeamValue): Promise<ITeam> {
+  const { data, error }: PostgrestResponse<ITeam> = await supabase
+    .from("teams")
+    .insert({
+      name: team.name,
+      max_member: team.max_member,
+      contest_id: team.contestId
+    })
+    .select("*")
+    .then((response) => response as PostgrestResponse<ITeam>);
+  if (error) {
+    throw new Error(error);
+  } else {
+    if (data && data.length !== 0) return data[0];
+    else throw new Error("Không thêm được team");
+  }
+}
+
+export async function insertTeamMember(team: ITeam, accountId: number): Promise<boolean> {
+  const { data, error }: PostgrestResponse<ITeamMember> = await supabase
+    .from("team_members")
+    .insert({
+      team_id: team.id,
+      account_id: accountId,
+      is_leader: true
+    })
+    .select("*")
+    .then((response) => response as PostgrestResponse<ITeamMember>);
+  if (error) {
+    throw error;
+  } else {
+    if (data && data.length !== 0) return true;
+    else throw new Error("Lỗi khi thêm team member");
+  }
+}
+
+export async function getTeamList(contestId: number): Promise<ITeam[]> {
+  const { data, error }: PostgrestResponse<ITeam> = await supabase
+    .rpc("get_team_list", { contestid: contestId })
+    // .from("teams")
+    // .select("*")
+    // .eq("contest_id", contestId)
+    // .order("max_member", { ascending: false })
+    .then((response) => response as PostgrestResponse<ITeam>);
+  if (error) {
+    throw error;
+  } else {
+    if (data && data.length !== 0) return data;
+    else {
+      return [];
+    }
+  }
+}
+
+export async function getTeamMember(teamId: number): Promise<ITeamMember[]> {
+  const { data, error }: PostgrestResponse<ITeamMember> = await supabase
+    .rpc("get_team_members", { teamid: teamId })
+    .then((response) => response as PostgrestResponse<ITeamMember>);
+  if (error) {
+    throw error;
+  } else {
+    if (data && data.length !== 0) return data;
+    else return [];
+  }
+}
+
+export async function handleJoinTeamAPI(teamId: number, accountId: number): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("team_members")
+    .insert({
+      team_id: teamId,
+      account_id: accountId,
+      is_leader: false
+    })
+    .select("*");
+  if (error) {
+    throw error;
+  } else {
+    if (data && data.length !== 0) return true;
+    else {
+      console.error("handleJoinTeamAPI");
+      return false;
+    }
+  }
+}
+
+export async function leaveTeam(id: number): Promise<boolean> {
   try {
-    const { data, error }: PostgrestResponse<ITeam> = await supabase
-      .from("teams")
-      .insert({
-        name: team.name,
-        max_member: team.max_member,
-        contest_id: team.contestId
-      })
-      .select("*")
-      .then((response) => response as PostgrestResponse<ITeam>);
+    const { error } = await supabase.from("team_members").delete().eq("id", id).select("*");
     if (error) {
       throw error;
     } else {
-      return data;
+      return true;
     }
   } catch (error) {
-    console.error("Lỗi insert team: ", error);
+    console.error("leaveTeam: ", error);
+    return false;
   }
 }
 
-export async function handleCreateTeam(valueForm: IFormTeamValue, accountId: number) {
+export async function deleteTeam(teamId: number): Promise<boolean> {
   try {
-    let team: ITeam = {
-      id: 0,
-      name: "",
-      max_member: 0,
-      contest_id: 0,
-      score: 0
-    };
-    await insertTeam(valueForm).then((response) => {
-      if (response && response.length !== 0) {
-        team = response[0];
-      }
-    });
-    const { data, error }: PostgrestResponse<ITeamMember> = await supabase
-      .from("team_members")
-      .insert({
-        team_id: team.id,
-        account_id: accountId,
-        is_leader: true
-      })
-      .select("*")
-      .then((response) => response as PostgrestResponse<ITeamMember>);
+    const { error } = await supabase.from("teams").delete().eq("id", teamId).select("*");
     if (error) {
       throw error;
     } else {
-      return data;
+      return true;
     }
   } catch (error) {
-    console.error("Lỗi create team: ", error);
+    console.error("deleteTeam: ", error);
+    return false;
   }
 }
 
-export async function getTeamList(contestId: number) {
-  try {
-    const { data, error }: PostgrestResponse<ITeam> = await supabase
-      .from("teams")
-      .select("*")
-      .eq("contest_id", contestId)
-      .then((response) => response as PostgrestResponse<ITeam>);
-    if (error) {
-      console.error("Lỗi get team list: ", error);
-    } else {
-      return data;
-    }
-  } catch (error) {
-    console.error("Lỗi get team list: ", error);
+export async function getTeamsByContestId(contestId: number): Promise<ITeam[]> {
+  const { data, error }: PostgrestResponse<ITeam> = await supabase
+    .from("teams")
+    .select("*")
+    .eq("contest_id", contestId)
+    .then((response) => response as PostgrestResponse<ITeam>);
+  if (error) {
+    throw error;
+  } else {
+    if (data && data.length !== 0) return data;
+    else return [];
   }
 }
 
-export async function getTeamMember(teamIds: number[]) {
-  try {
-    const { data, error }: PostgrestResponse<ITeamMemberDetail> = await supabase
-      .from("team_members")
-      .select(`*, accounts("*")`)
-      .in("team_id", teamIds)
-      .then((response) => response as PostgrestResponse<ITeamMemberDetail>);
-    if (error) {
-      console.error("Lỗi get team member: ", error);
-    } else {
-      return data;
-    }
-  } catch (error) {
-    console.error("Lỗi get team member: ", error);
+export async function getTeamRanks(contest_id: number): Promise<ITeamRank[]> {
+  const { data, error }: PostgrestResponse<ITeamRank> = await supabase
+    .rpc("calculate_team_ranks", { id_query: contest_id })
+    .then((response) => response as PostgrestResponse<ITeamRank>);
+  if (error) {
+    throw error;
+  } else {
+    if (data) return data;
+    else return [];
   }
 }
 
-export async function handleJoinTeamAPI(teamId: number, accountId: number) {
-  try {
-    const { data, error } = await supabase
-      .from("team_members")
-      .insert({
-        team_id: teamId,
-        account_id: accountId,
-        is_leader: false
-      })
-      .select("*");
-    if (error) {
-      console.error("Lỗi join team: ", error);
-    } else {
-      return data;
-    }
-  } catch (error) {
-    console.error("Lỗi join team: ", error);
-  }
-}
-
-export async function handleLeaveTeamAPI(id: number) {
-  try {
-    const { data, error } = await supabase.from("team_members").delete().eq("id", id).select("*");
-    if (error) {
-      console.error("Lỗi leave team: ", error);
-    } else {
-      return data;
-    }
-  } catch (error) {
-    console.error("Lỗi leave team: ", error);
-  }
-}
-
-export async function handleDeleteTeam(teamId: number) {
-  try {
-    const { data, error } = await supabase.from("teams").delete().eq("id", teamId).select("*");
-    if (error) {
-      console.error("Lỗi delete team: ", error);
-    } else {
-      return data;
-    }
-  } catch (error) {
-    console.error("Lỗi delete team: ", error);
-  }
-}
-
-export async function getTeams() {
-  try {
-    const { data, error }: PostgrestResponse<ITeam> = await supabase
-      .from("teams")
-      .select("*")
-      .then((response) => response as PostgrestResponse<ITeam>);
-    if (error) {
-      console.error("Lỗi lấy danh sách đội: ", error);
-    } else {
-      return data;
-    }
-  } catch (error) {
-    console.error("Lỗi lấy danh sách đội: ", error);
-  }
-}
-
-export async function getTeamIds(account_id: number) {
-  try {
-    const { data, error }: PostgrestResponse<ITeamId> = await supabase
-      .from("team_members")
-      .select("team_id")
-      .eq("account_id", account_id)
-      .then((response) => response as PostgrestResponse<ITeamId>);
-
-    if (error) {
-      console.error("getTeamMemberIds: ", error);
-    } else {
-      return data;
-    }
-  } catch (error) {
-    console.error("getTeamMemberIds: ", error);
-  }
-}
-
-export async function getContestIds(teamIds: number[]) {
-  try {
-    const { data, error }: PostgrestResponse<IContestId> = await supabase
-      .from("teams")
-      .select("contest_id")
-      .in("id", teamIds)
-      .then((response) => response as PostgrestResponse<IContestId>);
-    if (error) {
-      console.error("getContestIds: ", error);
-    } else {
-      return data;
-    }
-  } catch (error) {
-    console.error("getContestIds: ", error);
+export async function getRankContest(contestId: number): Promise<IDataRankContest[]> {
+  const { data, error }: PostgrestResponse<IDataRankContest> = await supabase
+    .rpc("get_rank_contest", { contestid: contestId })
+    .then((response) => response as PostgrestResponse<IDataRankContest>);
+  if (error) {
+    throw error;
+  } else {
+    if (data && data.length !== 0) return data;
+    else return [];
   }
 }

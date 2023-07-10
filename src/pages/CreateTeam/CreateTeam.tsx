@@ -1,7 +1,7 @@
-import Header from "../../components/Header";
+import Header from "~/components/Header";
 import { TiPlus } from "react-icons/all";
 import { FormEvent, useState } from "react";
-import FormCreateTeam from "../../components/FormCreateTeam";
+import FormCreateTeam from "~/components/FormCreateTeam";
 import Swal from "sweetalert2";
 // import OverviewTeam from "../../components/OverviewTeam";
 
