@@ -14,7 +14,7 @@ export async function insertTeam(team: IFormTeamValue): Promise<ITeam> {
     .select("*")
     .then((response) => response as PostgrestResponse<ITeam>);
   if (error) {
-    throw new Error(error);
+    throw error;
   } else {
     if (data && data.length !== 0) return data[0];
     else throw new Error("Không thêm được team");
