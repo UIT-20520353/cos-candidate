@@ -1,6 +1,5 @@
 import { SubmitHandler, useForm } from "react-hook-form";
-import { IAccount, IFormChangePassword } from "~/types/account.type";
-import { useEffect, useState } from "react";
+import { IFormChangePassword } from "~/types/account.type";
 import { changePassword, getAccountInfo } from "~/Query/api/account-services";
 import Swal from "sweetalert2";
 import CryptoJS from "crypto-js";

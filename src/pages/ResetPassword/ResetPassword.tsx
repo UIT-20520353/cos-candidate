@@ -1,30 +1,36 @@
 import { NavLink } from "react-router-dom";
 import { BiLeftArrowAlt } from "react-icons/all";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import Swal from "sweetalert2";
 import emailjs from "@emailjs/browser";
 import { changePassword, checkEmail } from "~/Query/api/account-services";
 import CryptoJS from "crypto-js";
+import { toast } from "react-toastify";
 
 function ResetPassword() {
   const [email, setEmail] = useState<string>("");
 
-  const handleResetPassword = async () => {
+  const handleResetPassword = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     const regex = /^\S+@\S+\.\S+$/;
     if (!regex.test(email)) {
-      Swal.fire({ position: "center", titleText: "Email không hợp lệ", toast: true, icon: "error" });
+      toast("Email không hợp lệ", {
+        type: "error",
+        position: "bottom-right",
+        autoClose: 3000,
+        closeOnClick: false
+      });
       return;
     }
 
     const res = await checkEmail(email);
     if (!res || res.length === 0) {
-      Swal.fire({
-        position: "center",
-        icon: "error",
-        titleText: "Email chưa được đăng ký trong hệ thống",
-        showConfirmButton: true,
-        confirmButtonText: "Đồng ý",
-        allowOutsideClick: false
+      toast("Email chưa được đăng ký trong hệ thống", {
+        type: "error",
+        position: "bottom-right",
+        autoClose: 3000,
+        closeOnClick: false
       });
       return;
     }
@@ -63,7 +69,10 @@ function ResetPassword() {
 
   return (
     <div className={"flex h-screen items-center justify-center"}>
-      <form className={"flex w-1/2 flex-col items-center gap-y-5 rounded-md bg-gray-200 p-3 shadow-md"}>
+      <form
+        onSubmit={handleResetPassword}
+        className={"flex w-1/2 flex-col items-center gap-y-5 rounded-md bg-gray-200 p-3 shadow-md"}
+      >
         <p className={"font-serif text-2xl font-semibold uppercase tracking-wider text-[#10002b]"}>Quên mật khẩu?</p>
         <div className={"w-full"}>
           <span className={"mb-2 block text-base font-medium font-medium text-[#10002b] text-gray-900"}>Email</span>
@@ -80,7 +89,7 @@ function ResetPassword() {
         </div>
         <div className={" flex w-full flex-col items-center gap-y-3"}>
           <button
-            type={"button"}
+            type={"submit"}
             className={"w-full rounded-lg bg-[#240046] py-2 text-white duration-300 hover:bg-[#5a189a]"}
             onClick={handleResetPassword}
           >

@@ -1,4 +1,4 @@
-import { getProblemsByContestId, getRankContest, getTeamRanks, getTeamsByContestId } from "~/Query";
+import { getProblemsByContestId, getRankContest, getTeamRanks } from "~/Query";
 import { IProblem, ITeamRank } from "~/types";
 
 export interface IDataRankContest {

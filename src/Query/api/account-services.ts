@@ -29,20 +29,21 @@ export async function insertAccount(account: IFormValue) {
   }
 }
 
-export async function getAccountList() {
+export async function getAccountList(): Promise<IAccount[]> {
   try {
     const { data, error }: PostgrestResponse<IAccount> = await supabase
       .from("accounts")
       .select("*")
-      .eq("role_id", 3)
       .then((response) => response as PostgrestResponse<IAccount>);
     if (error) {
       throw error;
     } else {
-      return data;
+      if (data && data.length !== 0) return data;
+      else return [];
     }
   } catch (error) {
     console.error("Lỗi khi lấy danh sách account: ", error);
+    return [];
   }
 }
 
@@ -153,9 +154,10 @@ export async function checkEmail(email: string): Promise<IAccount[] | undefined>
       .from("accounts")
       .select("*")
       .eq("email", email)
+      .eq("role_id", 3)
       .then((res) => res as PostgrestResponse<IAccount>);
     if (error) {
-      console.error("checkEmail: ", error);
+      throw error;
     } else {
       return data;
     }

@@ -5,6 +5,7 @@ import { NavLink } from "react-router-dom";
 import { isEmailValid } from "~/utils/ValidateEmail/ValidateEmail";
 import Swal from "sweetalert2";
 import { getAccountList, insertAccount } from "~/Query/api/account-services";
+import { toast } from "react-toastify";
 
 const isPhoneNumberValid = (phoneNumber: string | null): boolean | string => {
   if (!phoneNumber) return true;
@@ -28,9 +29,7 @@ function Register() {
     setValue("phone", "");
     setValue("address", "");
     getAccountList().then((data) => {
-      if (data) {
-        setAccounts(data ?? []);
-      }
+      setAccounts(data);
     });
   }, []);
 
@@ -41,8 +40,25 @@ function Register() {
     if (result) return "Tên đăng nhập đã được sử dụng";
   };
 
+  const checkEmailExist = (email: string | undefined): boolean => {
+    if (!email) return true;
+
+    const result = accounts.find((account) => account.email === email);
+    return !!result;
+  };
+
   const onSubmit: SubmitHandler<IFormValue> = (data) => {
     if (data.password !== data.rePassword) {
+      return;
+    }
+
+    if (checkEmailExist(data.email)) {
+      toast("Email đã được sử dụng", {
+        type: "error",
+        position: "bottom-right",
+        autoClose: 3000,
+        closeOnClick: false
+      });
       return;
     }
 
